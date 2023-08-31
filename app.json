@@ -1,4 +1,34 @@
 {
-  "name": "main",
-  "displayName": "main"
+  "expo": {
+    "name": "portalpet-beta-v2",
+    "slug": "portalpet-beta-v2",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMotionUsageDescription": "Needs Permission for Steps"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./img/casita.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.portalpetbetav2"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
 }

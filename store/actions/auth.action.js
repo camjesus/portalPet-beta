@@ -1,7 +1,7 @@
-import AsyncStorage from 'react-native';
+import {AsyncStorage} from 'react-native';
 import axios from 'axios';
-//import constantes from '../../components/context/Constantes';
-//import * as firebase from 'firebase';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
 
 export const SIGNUP = 'SIGNUP';
 export const NEW_USER = 'NEW_USER';
@@ -9,7 +9,7 @@ export const CHECK_USER_ID = 'CHECK_USER_ID';
 export const DELETE_STORAGE = 'DELETE_STORAGE';
 
 export const signup = (userId) => {
-  return async (dispatch) => {  
+  return async (dispatch) => {
     dispatch({
       type: SIGNUP,
       userId: userId,
@@ -19,20 +19,15 @@ export const signup = (userId) => {
 
 export const AddnewUser = (newUser) => {
   return async (dispatch) => {
-    const url = 'signInUser/';
-    const resultado = await axios.post(url, newUser);
-
-    if (resultado.data.status === 'SUCESS') {
-      //  firebase
-      //    .auth()
-      //    .createUserWithEmailAndPassword(newUser.email, newUser.password)
-      //    .then((response) => {
-      //      console.log(response);
-      //    })
-      //    .cath((err) => {
-      //      console.log(err);
-      //    });
-    }
+  const auth = FIREBASE_AUTH;
+  
+    await createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
+    .then((response) => {
+      console.log(response);
+    })
+    .cath((err) => {
+      console.log(err);
+    });
 
     await AsyncStorage.setItem('userId', JSON.stringify(resultado.data.id));
     await AsyncStorage.setItem('nombre', newUser.nombre);
@@ -49,11 +44,11 @@ export const AddnewUser = (newUser) => {
 
 export const checkUserID = () => {
   return async (dispatch) => {
-    let userId = null;
     console.log('paso por check User');
-    await AsyncStorage.getItem('userId');
-    AsyncStorage.getItem('userId').then((value) => {
-      userId = value;
+    await AsyncStorage.getItem('id').then((value) => {
+      userId = value ?? 0;
+      console.log(userId);
+
       console.log(value);
 
       dispatch({
@@ -73,7 +68,7 @@ export const deleteStorage = () => {
       await AsyncStorage.removeItem('email');
       await AsyncStorage.removeItem('userId');
 
-      //firebase.auth().signOut();
+      firebase.auth().signOut();
     } catch (error) {
       console.log('error eliminando del storage' + error);
     }

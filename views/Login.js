@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, View, Image, AsyncStorage} from 'react-native';
+import {StyleSheet, View, Image} from 'react-native';
 import {
   TextInput,
   Button,
@@ -8,14 +8,15 @@ import {
   Portal,
   Text,
 } from 'react-native-paper';
-//import constantes from '../components/context/Constantes';
+import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 import globalStyles from '../styles/global';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
-//import * as firebase from 'firebase';
-import {signup} from '../store/actions/auth.action';
+import {signInWithEmailAndPassword} from 'firebase/auth';
+import { FIREBASE_AUTH , FIREBASE_DB} from '../FirebaseConfig';
+import { QuerySnapshot, collection, getDocs , onSnapshot, query, where} from 'firebase/firestore';
 
 const Login = (props) => {
   const dispatch = useDispatch();
@@ -28,24 +29,61 @@ const Login = (props) => {
   const userRef = useRef();
   const passRef = useRef();
   const isFirstTime = useRef(true);
-
+  const auth = FIREBASE_AUTH;
+  
   const crearUsuario = () => {
-    navigation.navigate('CrearUsuario');
+    navigation.navigate('NewUser');
   };
 
   const focusedTextInput = (ref) => {
     ref.current.focus();
   };
 
-  //useEffect(() => {
-  //  //Solo quiero que este hook se ejecute cuando modifico user
-  //  //no quiero que entre la primera vez que renderiza la pantalla
-  //  if (isFirstTime.current) {
-  //    isFirstTime.current = false;
-  //  } else {
-  //    saveUserInStorage();
-  //  }
-  //}, [user]);
+  useEffect(() => {
+    //Solo quiero que este hook se ejecute cuando modifico user
+    //no quiero que entre la primera vez que renderiza la pantalla
+    if (isFirstTime.current) {
+      isFirstTime.current = false;
+    } else {
+      saveUserInStorage();
+    }
+  }, [user]);
+
+
+  const getUserByUID = async (value) => {
+    console.log("usrid" + value);
+    try{
+      const colRef = collection(FIREBASE_DB,'users');
+      const q = query(colRef, where('uid', '==', value));
+       getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          if(doc != null)
+          {
+            setUser({
+              id: doc.id,
+              uid: doc.data().uid,
+              name: doc.data().name,
+              lastname: doc.data().lastname,
+              phone: doc.data().phone,
+              ubication: doc.data().ubication
+            })
+          }
+        })
+      });
+      console.log('user');
+      console.log(user);
+    }catch (ex){
+      console.log(ex);
+    }
+    
+    //getArrayFromCollection(result);
+}
+
+//const getArrayFromCollection = (collection) => {
+//  return collection.docs.map(doc => {
+//      return { ...doc.data(), id: doc.id };
+//  });
+//}
 
   const logIn = async () => {
     if (usuario === '' || password === '') {
@@ -53,34 +91,15 @@ const Login = (props) => {
       ingresarAlerta(true);
       return;
     }
-    const postUsuarios = {usuario, password};
-
-    const url = 'ingresarMobile';
-    console.log(url);
     try {
-      const resultado = await axios.post(url, postUsuarios);
-      console.log(resultado.data);
-      if (resultado.data.id === null) {
-        setMensaje('Usuario no encontrado');
-        ingresarAlerta(true);
-        return;
-      }
-      console.log('me logueo bien , guardo el user');
-      setUser(resultado.data);
-      //firebase
-      //  .auth()
-      //  .signInWithEmailAndPassword(usuario, password)
-      //  .then((response) => {
-      //    console.log('correctamente');
-      //    console.log(response);
-      //    dispatch(signup(resultado.data.id));
-      //  })
-      //  .catch((err) => {
-      //    console.log('ERROR');
-      //    console.log(err);
-      //  });
+      var response = await signInWithEmailAndPassword(auth, usuario, password);
+      console.log('correctamente');
+      console.log(response);
+      getUserByUID(response.user.uid);
+
     } catch (error) {
-      setMensaje('Ha ocurrido un error intente nuevamente');
+      console.log('ERROR');
+      setMensaje('Usuario no existente');
       ingresarAlerta(true);
       console.log('erro buscanbdo usuario' + error);
     }
@@ -89,10 +108,11 @@ const Login = (props) => {
   const saveUserInStorage = async () => {
     try {
       console.log('ENTRE user storage');
-      await AsyncStorage.setItem('userId', JSON.stringify(user.id));
-      await AsyncStorage.setItem('nombre', user.nombre);
-      await AsyncStorage.setItem('apellido', user.apellido);
-      await AsyncStorage.setItem('telefono', user.telefono);
+      await AsyncStorage.setItem('uid', user.uid);
+      await AsyncStorage.setItem('id', user.id);
+      await AsyncStorage.setItem('name', user.name);
+      await AsyncStorage.setItem('lastname', user.lastname);
+      await AsyncStorage.setItem('phone', user.phone);
       await AsyncStorage.setItem('email', user.email);
     } catch (error) {
       console.log('User Storage Error: ' + error);
@@ -152,20 +172,6 @@ const Login = (props) => {
           </View>
         </KeyboardAwareScrollView>
       </View>
-
-      <Portal>
-        <Dialog visible={alerta} style={globalStyles.dialog}>
-          <Dialog.Title style={globalStyles.dialogTitle}>Error</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph style={globalStyles.dialogMsj}>{mensaje}</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button mode="contained" onPress={() => ingresarAlerta(false)}>
-              Ok
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
     </View>
   );
 };
@@ -250,7 +256,7 @@ const style = StyleSheet.create({
   bienvenido: {
     fontSize: 18,
     color: '#252932',
-    fontFamily: 'MostWazted',
+    //fontFamily: 'MostWazted',
   },
   viewBienvenido: {
     marginTop: 10,
@@ -260,7 +266,7 @@ const style = StyleSheet.create({
   adoptaMe: {
     fontSize: 23,
     color: '#252932',
-    fontFamily: 'ArchitectsDaughter-Regular',
+    //fontFamily: 'ArchitectsDaughter-Regular',
   },
 });
 export default Login;

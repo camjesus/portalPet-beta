@@ -15,6 +15,8 @@ import {useDispatch} from 'react-redux';
 import {deleteStorage, checkUserID} from '../store/actions/auth.action';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {View, StyleSheet, Text} from 'react-native';
+import { FIREBASE_AUTH } from '../FirebaseConfig';
+import {signOut} from 'firebase/auth'
 
 const Drawer = createDrawerNavigator();
 //Defino el tema
@@ -40,7 +42,8 @@ const theme = {
 
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
-  const logOut = () => {
+  const handlelogOut = () => {
+    FIREBASE_AUTH.signOut();
     dispatch(deleteStorage());
   };
 
@@ -89,7 +92,7 @@ function CustomDrawerContent(props) {
             color="#9575cd"
           />
         )}
-        onPress={() => logOut()}
+        onPress={() => handlelogOut()}
       />
     </View>
   );

@@ -10,7 +10,6 @@ import {
   Paragraph,
 } from 'react-native-paper';
 import globalStyles from '../styles/global';
-//import constantes from '../components/context/Constantes';
 import axios from 'axios';
 
 const Account = ({navigation}) => {
@@ -33,17 +32,17 @@ const Account = ({navigation}) => {
     telefono,
   };
 
-  //useEffect(() => {
-  //  console.log('entre a cuena');
-  //  obtenerDatosStorage();
-  //  initialValues();
-  //}, []);
-//
-  //const initialValues = () => {
-  //  setEditoCampos(false);
-  //  setIconoRight('pencil');
-  //  gCamposEdit(true);
-  //};
+  useEffect(() => {
+    console.log('entre a cuena');
+    obtenerDatosStorage();
+    initialValues();
+  }, []);
+
+  const initialValues = () => {
+    setEditoCampos(false);
+    setIconoRight('pencil');
+    gCamposEdit(true);
+  };
 
   const obtenerDatosStorage = async () => {
     try {
@@ -81,18 +80,14 @@ const Account = ({navigation}) => {
         return;
       }
       try {
-        const url = 'modifyUser';
-        console.log(usuario);
-        const resultado = await axios.post(url, usuario);
-        console.log(resultado.data.status);
-        if (resultado.data.status === 'SUCESS') {
+        //agregar update al firebase
           await AsyncStorage.setItem('nombre', usuario.nombre);
           await AsyncStorage.setItem('apellido', usuario.apellido);
           await AsyncStorage.setItem('telefono', usuario.telefono);
           await AsyncStorage.setItem('email', usuario.email);
           guardaMensaje('El usuario se editó con éxito');
           ingresarAlerta(true);
-        }
+
       } catch (error) {
         console.log(error);
         guardaMensaje('Error al editar el usuario');
@@ -182,19 +177,6 @@ const Account = ({navigation}) => {
           </View>
         </ScrollView>
       </View>
-      <Portal>
-        <Dialog visible={alerta} style={globalStyles.dialog}>
-          <Dialog.Title style={globalStyles.dialogTitle}>Error</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph style={globalStyles.dialogMsj}>{mensaje}</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button mode="contained" onPress={() => ingresarAlerta(false)}>
-              Ok
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
     </View>
   );
 };
