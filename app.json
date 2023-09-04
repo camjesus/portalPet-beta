@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "portalpet-beta-v2",
-    "slug": "portalpet-beta-v2",
+    "name": "portalpet-beta",
+    "slug": "portalpet-beta",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
