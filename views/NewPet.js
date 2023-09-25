@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, View, PermissionsAndroid, Image, Alert, AsyncStorage} from 'react-native';
-
+import {StyleSheet, View, PermissionsAndroid, Image, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewPet = ({navigation, route, props}) => {
   const {params} = route;

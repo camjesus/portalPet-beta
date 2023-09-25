@@ -17,10 +17,10 @@ import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {View, StyleSheet, Text} from 'react-native';
 import { FIREBASE_AUTH } from '../FirebaseConfig';
 import {signOut} from 'firebase/auth'
+import {useNavigation} from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 //Defino el tema
-
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -41,9 +41,10 @@ const theme = {
 };
 
 function CustomDrawerContent(props) {
+  const auth = FIREBASE_AUTH;
   const dispatch = useDispatch();
-  const handlelogOut = () => {
-    FIREBASE_AUTH.signOut();
+  const handlelogOut = (auth) => {
+    auth.signOut();
     dispatch(deleteStorage());
   };
 
@@ -92,7 +93,7 @@ function CustomDrawerContent(props) {
             color="#9575cd"
           />
         )}
-        onPress={() => handlelogOut()}
+        onPress={() => handlelogOut(auth, props)}
       />
     </View>
   );
@@ -113,7 +114,7 @@ const DrawerPortal = (props, navigation) => {
             margin: 0,
             padding: 0,
           }}
-          drawerContentOptions={{
+          screenOptions={{
             style: {
               marginVertical: 100,
             },
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
   adoptaMe: {
     fontSize: 30,
     color: '#252932',
-    fontFamily: 'ArchitectsDaughter-Regular',
+    //fontFamily: 'ArchitectsDaughter-Regular',
     flex: 5,
     paddingTop: 30,
     paddingStart: 10,

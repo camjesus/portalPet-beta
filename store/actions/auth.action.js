@@ -1,5 +1,4 @@
-import {AsyncStorage} from 'react-native';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 
@@ -46,9 +45,11 @@ export const checkUserID = () => {
   return async (dispatch) => {
     console.log('paso por check User');
     await AsyncStorage.getItem('id').then((value) => {
-      userId = value ?? 0;
+      userId = value ?? null;
+      console.log('userId');
       console.log(userId);
 
+      console.log('value');
       console.log(value);
 
       dispatch({
@@ -63,12 +64,13 @@ export const deleteStorage = () => {
   return async (dispatch) => {
     try {
       console.log('borro del storage');
-      await AsyncStorage.removeItem('nombre');
-      await AsyncStorage.removeItem('apellido');
+      await AsyncStorage.removeItem('uid');
+      await AsyncStorage.removeItem('id');
+      await AsyncStorage.removeItem('name');
+      await AsyncStorage.removeItem('lastname');
+      await AsyncStorage.removeItem('phone');
       await AsyncStorage.removeItem('email');
-      await AsyncStorage.removeItem('userId');
-
-      firebase.auth().signOut();
+      
     } catch (error) {
       console.log('error eliminando del storage' + error);
     }

@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {StyleSheet, View, ScrollView, AsyncStorage} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {
   Text,
   IconButton,
@@ -10,8 +10,7 @@ import {
   Paragraph,
 } from 'react-native-paper';
 import globalStyles from '../styles/global';
-import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Account = ({navigation}) => {
   const [nombre, gNombre] = useState('');
   const [apellido, gApellido] = useState('');

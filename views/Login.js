@@ -8,8 +8,7 @@ import {
   Portal,
   Text,
 } from 'react-native-paper';
-import {AsyncStorage} from 'react-native';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import globalStyles from '../styles/global';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useNavigation} from '@react-navigation/native';
@@ -17,6 +16,7 @@ import {useDispatch} from 'react-redux';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import { FIREBASE_AUTH , FIREBASE_DB} from '../FirebaseConfig';
 import { QuerySnapshot, collection, getDocs , onSnapshot, query, where} from 'firebase/firestore';
+import {signup} from '../store/actions/auth.action';
 
 const Login = (props) => {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const Login = (props) => {
     if (isFirstTime.current) {
       isFirstTime.current = false;
     } else {
-      saveUserInStorage();
+      saveUserInStorage(user);
     }
   }, [user]);
 
@@ -57,6 +57,10 @@ const Login = (props) => {
       const q = query(colRef, where('uid', '==', value));
        getDocs(q).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
+          console.log('doc');
+          console.log(doc);
+          console.log('docData');
+          console.log(doc.data());
           if(doc != null)
           {
             setUser({
@@ -65,25 +69,20 @@ const Login = (props) => {
               name: doc.data().name,
               lastname: doc.data().lastname,
               phone: doc.data().phone,
+              email: doc.data().email,
               ubication: doc.data().ubication
             })
+            console.log('user');
+            console.log(user);
+            dispatch(signup(doc.id));
           }
         })
       });
-      console.log('user');
-      console.log(user);
+      
     }catch (ex){
       console.log(ex);
     }
-    
-    //getArrayFromCollection(result);
 }
-
-//const getArrayFromCollection = (collection) => {
-//  return collection.docs.map(doc => {
-//      return { ...doc.data(), id: doc.id };
-//  });
-//}
 
   const logIn = async () => {
     if (usuario === '' || password === '') {
@@ -94,9 +93,8 @@ const Login = (props) => {
     try {
       var response = await signInWithEmailAndPassword(auth, usuario, password);
       console.log('correctamente');
-      console.log(response);
+      //console.log(response);
       getUserByUID(response.user.uid);
-
     } catch (error) {
       console.log('ERROR');
       setMensaje('Usuario no existente');
@@ -105,15 +103,16 @@ const Login = (props) => {
     }
   };
 
-  const saveUserInStorage = async () => {
+  const saveUserInStorage = async (user) => {
     try {
       console.log('ENTRE user storage');
-      await AsyncStorage.setItem('uid', user.uid);
-      await AsyncStorage.setItem('id', user.id);
+      console.log(user);
+      await AsyncStorage.setItem('uid', JSON.stringify(user.uid));
+      await AsyncStorage.setItem('id', JSON.stringify(user.id));
       await AsyncStorage.setItem('name', user.name);
       await AsyncStorage.setItem('lastname', user.lastname);
       await AsyncStorage.setItem('phone', user.phone);
-      await AsyncStorage.setItem('email', user.email);
+      await AsyncStorage.setItem('email', JSON.stringify(user.email));
     } catch (error) {
       console.log('User Storage Error: ' + error);
     }

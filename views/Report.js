@@ -1,4 +1,6 @@
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Report = (props, route) => {
   const {params} = route;
   console.log(props.route.params);

@@ -24,7 +24,7 @@ const NewUser = ({navigation}) => {
   const [alerta, ingresarAlerta] = useState(false);
   const [mensaje, guardaMensaje] = useState('');
   const [titulo, setTitulo] = useState('');
-  const [resultadoCrear, setResultadoCrear] = useState('');
+  const [resultadoCrear, setResultadoCrear] = useState(false);
   const apellidoImp = useRef();
   const emailRef = useRef();
   const RpassRef = useRef();
@@ -33,6 +33,7 @@ const NewUser = ({navigation}) => {
   const auth = FIREBASE_AUTH;
 
   const guardarUsuario = async () => {
+    try{
     const ubicacion = '';
     if (
       nombre === '' ||
@@ -63,20 +64,11 @@ const NewUser = ({navigation}) => {
       ingresarAlerta(true);
       return;
     }
-    const nuevoUsuario = {
-      //uid
-      //docID
-      nombre,
-      apellido,
-      email,
-      password,
-      ubicacion,
-      telefono,
-    };
-    console.log(nuevoUsuario);
-    //dispatch(AddnewUser(nuevoUsuario));
-    try{
-      const response = await createUserWithEmailAndPassword(auth, nuevoUsuario.email, nuevoUsuario.password);
+    console.log('nuevoUsuario');
+    console.log(email);
+    console.log(password);
+
+      const response = await createUserWithEmailAndPassword(auth, email, password);
       console.log(response);
       //GUARDO EN MI BASE DE DATOS USERS
       const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
@@ -88,12 +80,14 @@ const NewUser = ({navigation}) => {
         phone: telefono
       });
       console.log(newDoc);
+      console.log('response');
+      console.log(response);
+      setResultadoCrear(true);
     }
     catch(ex){
       console.log("eeror al crear usuario" + ex);
     }
-
-    navigation.goBack();
+    setResultadoCrear(false);
   };
 
   const focusedTextInput = (ref) => {
@@ -101,10 +95,10 @@ const NewUser = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (!alerta && resultadoCrear === 'SUCESS') {
-      navigation.navigate('BuscarStack', {screen: 'Login'});
+    if (resultadoCrear) {
+      navigation.navigate('Login');
     }
-  }, [alerta]);
+  }, [resultadoCrear]);
 
   return (
     <View style={globalStyles.base}>
