@@ -7,6 +7,7 @@ import {
   Paragraph,
   Portal,
   Text,
+  PaperProvider
 } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import globalStyles from '../styles/global';
@@ -15,7 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import { FIREBASE_AUTH , FIREBASE_DB} from '../FirebaseConfig';
-import { QuerySnapshot, collection, getDocs , onSnapshot, query, where} from 'firebase/firestore';
+import { collection, getDocs, query, where} from 'firebase/firestore';
 import {signup} from '../store/actions/auth.action';
 
 const Login = (props) => {
@@ -72,15 +73,17 @@ const Login = (props) => {
               email: doc.data().email,
               ubication: doc.data().ubication
             })
-            console.log('user');
-            console.log(user);
             dispatch(signup(doc.id));
           }
         })
       });
-      
+      console.log('user en Login');
+      console.log(user);
     }catch (ex){
       console.log(ex);
+      console.log('ERROR');
+      setMensaje('Error al buscar usuario en la base de datos');
+      ingresarAlerta(true);
     }
 }
 
@@ -104,74 +107,94 @@ const Login = (props) => {
   };
 
   const saveUserInStorage = async (user) => {
-    try {
-      console.log('ENTRE user storage');
-      console.log(user);
-      await AsyncStorage.setItem('uid', JSON.stringify(user.uid));
-      await AsyncStorage.setItem('id', JSON.stringify(user.id));
-      await AsyncStorage.setItem('name', user.name);
-      await AsyncStorage.setItem('lastname', user.lastname);
-      await AsyncStorage.setItem('phone', user.phone);
-      await AsyncStorage.setItem('email', JSON.stringify(user.email));
-    } catch (error) {
-      console.log('User Storage Error: ' + error);
+    if(user!= null || user!= undefined)
+    {
+      try {
+        console.log('ENTRE user storage');
+        console.log(user);
+        await AsyncStorage.setItem('uid', JSON.stringify(user.uid));
+        await AsyncStorage.setItem('id', JSON.stringify(user.id));
+        await AsyncStorage.setItem('name', user.name);
+        await AsyncStorage.setItem('lastname', user.lastname);
+        await AsyncStorage.setItem('phone', user.phone);
+        await AsyncStorage.setItem('email', JSON.stringify(user.email));
+      } catch (error) {
+        console.log('User Storage Error: ' + error);
+      }
     }
   };
 
   return (
-    <View style={globalStyles.base}>
-      <View style={style.viewLogo}>
-        <Image source={require('../img/casita_b.png')} style={style.imglogo} />
-      </View>
-      <View style={style.cardLogin}>
-        <View style={style.viewBienvenido}>
-          <Text style={style.bienvenido}>Bienvenido a </Text>
-          <Text style={style.adoptaMe}>Portal Pet</Text>
+    <PaperProvider>
+      <View style={globalStyles.base}>
+        <View style={style.viewLogo}>
+          <Image source={require('../img/casita_b.png')} style={style.imglogo} />
         </View>
-        <KeyboardAwareScrollView>
-          <TextInput
-            label="E-Mail"
-            value={usuario}
-            onChangeText={(texto) => setEmail(texto)}
-            style={style.input}
-            ref={userRef}
-            autoCapitalize="none"
-            onSubmitEditing={(event) => {
-              focusedTextInput(passRef);
-            }}
-            left={<TextInput.Icon name="email" color="#9575cd" />}
-          />
-          <TextInput
-            label="Contraseña"
-            value={password}
-            onChangeText={(texto) => setPass(texto)}
-            style={style.input}
-            ref={passRef}
-            left={<TextInput.Icon name="key" color="#9575cd" />}
-            secureTextEntry={true}
-          />
+        <View style={style.cardLogin}>
+          <View style={style.viewBienvenido}>
+            <Text style={style.bienvenido}>Bienvenido a </Text>
+            <Text style={style.adoptaMe}>Portal Pet</Text>
+          </View>
+          <KeyboardAwareScrollView>
+            <TextInput
+              label="E-Mail"
+              value={usuario}
+              onChangeText={(texto) => setEmail(texto)}
+              style={style.input}
+              ref={userRef}
+              autoCapitalize="none"
+              onSubmitEditing={(event) => {
+                focusedTextInput(passRef);
+              }}
+              left={<TextInput.Icon name="email" color="#9575cd" />}
+            />
+            <TextInput
+              label="Contraseña"
+              value={password}
+              onChangeText={(texto) => setPass(texto)}
+              style={style.input}
+              ref={passRef}
+              left={<TextInput.Icon name="key" color="#9575cd" />}
+              secureTextEntry={true}
+            />
 
-          <Button
-            style={style.ingresar}
-            mode="contained"
-            onPress={() => logIn()}>
-            Ingresar
-          </Button>
-          <View style={style.viewRow}>
-          </View>
-          <View style={style.viewNuevaCuenta}>
-            <Text style={style.registrate} />
             <Button
-              style={style.nuevaCuenta}
-              mode="outlined"
-              color="#252932"
-              onPress={() => crearUsuario()}>
-              Registrate acá
+              style={style.ingresar}
+              mode="contained"
+              onPress={() => logIn()}>
+              Ingresar
             </Button>
+            <View style={style.viewRow}>
+            </View>
+            <View style={style.viewNuevaCuenta}>
+              <Text style={style.registrate} />
+              <Button
+                style={style.nuevaCuenta}
+                mode="outlined"
+                color="#252932"
+                onPress={() => crearUsuario()}>
+                Registrate acá
+              </Button>
+            </View>
+          </KeyboardAwareScrollView>
+        </View>
+          <View>
+            <Portal>
+              <Dialog visible={alerta} style={globalStyles.dialog}>
+                <Dialog.Title style={globalStyles.dialogTitle}>Error</Dialog.Title>
+                <Dialog.Content>
+                  <Paragraph style={globalStyles.dialogMsj}>{mensaje}</Paragraph>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button mode="contained" onPress={() => ingresarAlerta(false)}>
+                    Ok
+                  </Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
           </View>
-        </KeyboardAwareScrollView>
       </View>
-    </View>
+    </PaperProvider>
   );
 };
 const style = StyleSheet.create({

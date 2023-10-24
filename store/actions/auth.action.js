@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_DB} from '../../FirebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
 
 export const SIGNUP = 'SIGNUP';
 export const NEW_USER = 'NEW_USER';
@@ -9,6 +10,7 @@ export const DELETE_STORAGE = 'DELETE_STORAGE';
 
 export const signup = (userId) => {
   return async (dispatch) => {
+    console.log("signup: " + userId)
     dispatch({
       type: SIGNUP,
       userId: userId,
@@ -19,24 +21,32 @@ export const signup = (userId) => {
 export const AddnewUser = (newUser) => {
   return async (dispatch) => {
   const auth = FIREBASE_AUTH;
-  
-    await createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
-    .then((response) => {
-      console.log(response);
-    })
-    .cath((err) => {
-      console.log(err);
+  try {
+    const response = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
+    console.log(response);
+    //GUARDO EN MI BASE DE DATOS USERS
+    const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
+      uid: response.user.uid,
+      name: nombre,
+      lastname: apellido,
+      email: email,
+      ubication: null,
+      phone: telefono
     });
-
-    await AsyncStorage.setItem('userId', JSON.stringify(resultado.data.id));
-    await AsyncStorage.setItem('nombre', newUser.nombre);
-    await AsyncStorage.setItem('apellido', newUser.apellido);
-    await AsyncStorage.setItem('telefono', newUser.telefono);
-    await AsyncStorage.setItem('email', newUser.email);
+    console.log(newDoc);
+    console.log('response');
+    console.log(response);
+    setResultadoCrear(true);
+  }
+  catch(error){
+      console.log("eeror al crear usuario" + error.code + error.message);
+      console.log(error);
+      setResultadoCrear(false);
+    }
 
     dispatch({
       type: NEW_USER,
-      userId: resultado.data.id,
+      userId: response.user.uid,
     });
   };
 };
@@ -44,14 +54,17 @@ export const AddnewUser = (newUser) => {
 export const checkUserID = () => {
   return async (dispatch) => {
     console.log('paso por check User');
-    await AsyncStorage.getItem('id').then((value) => {
-      userId = value ?? null;
+    await AsyncStorage.getItem('uid').then((value) => {
+      let userId = null;
+      if(value == undefined || value != null)
+      {
+        userId = value;
+      }
       console.log('userId');
       console.log(userId);
 
       console.log('value');
       console.log(value);
-
       dispatch({
         type: CHECK_USER_ID,
         userId: userId,

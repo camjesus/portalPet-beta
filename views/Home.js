@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {View, StyleSheet, Image} from 'react-native';
 import globalStyle from '../styles/global';
-import GetLocation from 'react-native-get-location';
+import * as Location from 'expo-location';
 import {Text, Button, IconButton} from 'react-native-paper';
 import globalStyles from '../styles/global';
 import SwiperCard from '../components/ui/SwiperCard';
@@ -19,6 +19,8 @@ const Home = ({navigation, route, props}) => {
   const [distancia] = useState(100);
   const paramsDefault = new URLSearchParams();
   const [index, setIndex] = useState(0);
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   //Botones accion mascota
 
@@ -31,6 +33,23 @@ const Home = ({navigation, route, props}) => {
   paramsDefault.append('tipoMascota', 'PERRO');
   paramsDefault.append('tipoMascota', 'GATO');
   paramsDefault.append('distancia', distancia);
+
+  useEffect(() => {
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      console.log(JSON.stringify(location));
+      setLocation(location);
+      paramsDefault.append('latitud', location.latitud); //-34.634491);
+      paramsDefault.append('longitud', location.longitud); //-58.4648853);
+    })();
+  }, []);
 
   useEffect(() => {
     gConsHome(true);
@@ -72,28 +91,11 @@ const Home = ({navigation, route, props}) => {
 
   const goToFiltros = () => {
     gPrimerCarga(false);
-    navigation.navigate('filtros', {filtros: paramsDefault});
+    navigation.navigate('Filters', {filtros: paramsDefault});
   };
 
   const heandlePress = () => {
     navigation.toggleDrawer();
-  };
-
-  const getCurrentPositionNow = async () => {
-      GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 60000,
-    })
-    .then(location => {
-        console.log(location);
-        console.log('Obtener mascotas se viene');
-        //obtenerMasDisponilbes(location.latitude, location.longitude); 
-        //obtenerMasDisponilbes(-34.634491, -58.4648853); 
-    })
-    .catch(error => {
-        const { code, message } = error;
-        console.warn(code, message);
-    })
   };
 
   useEffect(() => {
@@ -101,7 +103,7 @@ const Home = ({navigation, route, props}) => {
     if (consultarHome) {
       console.log('entra a disponi');
       //obtenerMasDisponilbes();
-      getCurrentPositionNow();
+      //getCurrentPositionNow();
       gConsHome(false);
     }
   }, [consultarHome]);

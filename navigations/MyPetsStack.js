@@ -6,6 +6,7 @@ import NewPet from '../views/NewPet';
 import StatesAdoption from '../views/StatesAdoption';
 import StatusPet from '../views/StatusPet';
 import DetailsPet from '../views/DetailsPet';
+import MyCamera from '../views/MyCamera';
 
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
@@ -34,11 +35,15 @@ const theme = {
 export default function MyPetsStack() {
   return (
     <PaperProvider theme={theme}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          headerMode: 'none',
+        }}>
         <Stack.Screen
           name="MyPets"
           component={MyPets}
-          options={{headerShown: false}}
+          screenOptions={{headerShown: false}}
         />
 
         <Stack.Screen
@@ -64,6 +69,11 @@ export default function MyPetsStack() {
          <Stack.Screen
           name="DetailsPet"
           component={DetailsPet}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="MyCamera"
+          component={MyCamera}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

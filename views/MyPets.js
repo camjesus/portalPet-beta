@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
 import {Headline, FAB} from 'react-native-paper';
-import axios from 'axios';
 import globalStyles from '../styles/global';
 import MascotaItem from '../components/ui/MascotaItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -52,8 +51,7 @@ const MyPets = (props) => {
 
   const obtenerDatosStorage = async () => {
     try {
-      await AsyncStorage.getItem('userId');
-      AsyncStorage.getItem('userId').then((value) => {
+      await AsyncStorage.getItem('uid').then((value) => {
         gUserId(value);
         //voy a buscar las mascotas una vez que tengo cargado el id, ya que es asincrono
         obtenerMascotas(value);
@@ -64,15 +62,24 @@ const MyPets = (props) => {
   };
 
   const obtenerMascotas = async (value) => {
-    try {
-      const url = constantes.BASE_URL + `mascotasUsuario/${value}`;
-      console.log(url);
-      const resultado = await axios.get(url);
-      console.log(resultado.data);
-      console.log('paso por obetener mascotas');
-      guardarMascotas(resultado.data);
-    } catch (error) {
-      console.log(error);
+   try{
+    const colRef = collection(FIREBASE_DB,'pets');
+      const q = query(colRef, where('uid', '==', value));
+       getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log('doc');
+          console.log(doc);
+          console.log('docPet');
+          console.log(doc.data());
+          if(doc != null)
+          {
+            guardarMascotas(doc.data())
+          }
+        })
+      });  
+    }catch (ex){
+      console.log(ex);
+      console.log('ERROR AL BUSCAR MASCOTAS');
     }
   };
 
@@ -92,7 +99,7 @@ const MyPets = (props) => {
           color="#FFFFFF"
           style={styles.iconEdit}
           onPress={() => {
-            navigation.navigate('crearMascota', {
+            navigation.navigate('NewPet', {
               mascotaItem: newMascota,
             });
           }}
@@ -126,7 +133,7 @@ const MyPets = (props) => {
           style={styles.fab}
           color="#FFFFFF"
           onPress={() => {
-            navigation.navigate('crearMascota', {
+            navigation.navigate('NewPet', {
               mascotaItem: newMascota,
             });
           }}

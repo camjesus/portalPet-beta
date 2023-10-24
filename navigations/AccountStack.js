@@ -28,7 +28,7 @@ const Stack = createStackNavigator();
 
 export default function AccountStack() {
   return (
-    <PaperProvider theme={theme}>
+    <PaperProvider theme={theme} >
       <Stack.Navigator>
         <Stack.Screen
           name="Login"

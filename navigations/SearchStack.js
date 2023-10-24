@@ -32,7 +32,13 @@ const theme = {
 export default function SearchStack() {
   return (
     <PaperProvider theme={theme}>
-      <Stack.Navigator>
+      <Stack.Navigator  
+       initialRouteName="Home"
+       screenOptions={{
+         headerShown: false,
+         headerMode: 'none',
+       }}
+        >
         <Stack.Screen
           name="Home"
           component={Home}

@@ -47,23 +47,24 @@ const Account = ({navigation}) => {
     try {
       await AsyncStorage.getItem('email').then((value) => {
         gEmail(value);
+        console.log(value);
       });
 
-      await AsyncStorage.getItem('nombre').then((value) => {
+      await AsyncStorage.getItem('name').then((value) => {
         gNombre(
           value.substring(0, 1).toUpperCase() +
-            value.substr(1, value.length - 1),
+            value.substring(1, value.length),
         );
       });
 
-      await AsyncStorage.getItem('apellido').then((value) => {
+      await AsyncStorage.getItem('lastname').then((value) => {
         gApellido(
           value.substring(0, 1).toUpperCase() +
-            value.substr(1, value.length - 1),
+            value.substring(1, value.length),
         );
       });
 
-      await AsyncStorage.getItem('telefono').then((value) => {
+      await AsyncStorage.getItem('phone').then((value) => {
         gTelefono(value);
       });
     } catch (error) {
@@ -80,9 +81,9 @@ const Account = ({navigation}) => {
       }
       try {
         //agregar update al firebase
-          await AsyncStorage.setItem('nombre', usuario.nombre);
-          await AsyncStorage.setItem('apellido', usuario.apellido);
-          await AsyncStorage.setItem('telefono', usuario.telefono);
+          await AsyncStorage.setItem('name', usuario.nombre);
+          await AsyncStorage.setItem('lastname', usuario.apellido);
+          await AsyncStorage.setItem('phone', usuario.telefono);
           await AsyncStorage.setItem('email', usuario.email);
           guardaMensaje('El usuario se editó con éxito');
           ingresarAlerta(true);
@@ -104,7 +105,7 @@ const Account = ({navigation}) => {
           icon="arrow-left"
           color="#FFFFFF"
           style={style.iconBack}
-          onPress={() => navigation.navigate('BuscarStack', {screen: 'Home'})}
+          onPress={() => navigation.navigate('Home')}
           size={30}
         />
         <Text style={style.title}>Mis Datos</Text>

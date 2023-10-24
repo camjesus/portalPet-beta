@@ -161,7 +161,7 @@ const MascotaItem = ({mascota, consultarMascotas, navigation, route}) => {
                   color="#FFFFFF"
                   style={style.fab}
                   onPress={() => {
-                    navigation.navigate('crearMascota', {mascotaItem: mascota});
+                    navigation.navigate('NewPet', {mascotaItem: mascota});
                   }}
                   size={30}
                 />

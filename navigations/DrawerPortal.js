@@ -73,7 +73,7 @@ function CustomDrawerContent(props) {
           />
         )}
         onPress={() =>
-          props.navigation.navigate('SearchStack', {screen: 'account'})
+          props.navigation.navigate('Account')
         }
       />
       <DrawerItem
@@ -137,6 +137,7 @@ const DrawerPortal = (props, navigation) => {
             navigation={navigation}
             options={{
               drawerLabel: 'Buscar',
+              headerShown: false,
               drawerIcon: ({focused, size, color}) => (
                 <Icon
                   reverse
@@ -153,6 +154,7 @@ const DrawerPortal = (props, navigation) => {
             component={MyPetsStack}
             options={{
               drawerLabel: 'Mis Mascotas',
+              headerShown: false,
               drawerIcon: ({focused, size}) => (
                 <Icon
                   reverse
@@ -169,6 +171,7 @@ const DrawerPortal = (props, navigation) => {
             component={ChatsStack}
             options={{
               drawerLabel: 'Chats',
+              headerShown: false,
               drawerIcon: ({focused, size}) => (
                 <Icon
                   reverse
@@ -185,6 +188,7 @@ const DrawerPortal = (props, navigation) => {
             component={EventStack}
             options={{
               drawerLabel: 'Eventos',
+              headerShown: false,
               drawerIcon: ({focused, size}) => (
                 <Icon
                   reverse

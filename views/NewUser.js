@@ -7,12 +7,15 @@ import {
   Dialog,
   Paragraph,
   IconButton,
+  PaperProvider
 } from 'react-native-paper';
 import globalStyles from '../styles/global';
 import {ScrollView} from 'react-native-gesture-handler';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
+//import {createUserWithEmailAndPassword} from 'firebase/auth';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../FirebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+//import { collection, addDoc } from 'firebase/firestore';
+import {AddnewUser} from '../store/actions/auth.action';
+import {useDispatch} from 'react-redux';
 
 const NewUser = ({navigation}) => {
   const [nombre, gNombre] = useState('');
@@ -53,7 +56,7 @@ const NewUser = ({navigation}) => {
     if (reg.test(password) === false) {
       setTitulo('Validación');
       guardaMensaje(
-        'Las contraseñas deben tener 8 caracteres una mayúscula y un número',
+        'La contraseña debe tener 8 caracteres una mayúscula y un número',
       );
       ingresarAlerta(true);
       return;
@@ -68,26 +71,34 @@ const NewUser = ({navigation}) => {
     console.log(email);
     console.log(password);
 
-      const response = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(response);
-      //GUARDO EN MI BASE DE DATOS USERS
-      const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
-        uid: response.user.uid,
-        name: nombre,
-        lastname: apellido,
-        email: email,
-        ubication: null,
-        phone: telefono
-      });
-      console.log(newDoc);
-      console.log('response');
-      console.log(response);
+      //const response = await createUserWithEmailAndPassword(auth, email, password);
+      //console.log(response);
+      ////GUARDO EN MI BASE DE DATOS USERS
+      //const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
+      //  uid: response.user.uid,
+      //  name: nombre,
+      //  lastname: apellido,
+      //  email: email,
+      //  ubication: null,
+      //  phone: telefono
+      //});
+      const newUser = {
+        nombre,
+        apellido,
+        email,
+        password,
+        ubicacion,
+        telefono,
+      };
+      console.log(newUser);
+      useDispatch(AddnewUser(newUser));
       setResultadoCrear(true);
     }
-    catch(ex){
-      console.log("eeror al crear usuario" + ex);
+    catch(error){
+      console.log("eeror al crear usuario" + error.code + error.message);
+      console.log(error);
+      setResultadoCrear(false);
     }
-    setResultadoCrear(false);
   };
 
   const focusedTextInput = (ref) => {
@@ -101,96 +112,118 @@ const NewUser = ({navigation}) => {
   }, [resultadoCrear]);
 
   return (
-    <View style={globalStyles.base}>
-      <View style={style.header}>
-        <IconButton
-          icon="arrow-left"
-          color="#FFFFFF"
-          style={globalStyles.iconBack}
-          onPress={() => navigation.goBack()}
-          size={30}
-        />
-        <Text style={style.title}>Ingresa tus datos</Text>
-        <View style={globalStyles.viewR} />
-      </View>
-      <View style={style.cardNew}>
-        <ScrollView style={style.scroll}>
-          <View style={style.contenedor}>
-            <TextInput
-              label="Nombre"
-              onChangeText={(texto) => gNombre(texto)}
-              style={style.input}
-              value={nombre}
-              onSubmitEditing={(event) => {
-                focusedTextInput(apellidoImp);
-              }}
-            />
-            <TextInput
-              label="Apellido"
-              onChangeText={(texto) => gApellido(texto)}
-              style={style.input}
-              value={apellido}
-              ref={apellidoImp}
-              onSubmitEditing={(event) => {
-                focusedTextInput(emailRef);
-              }}
-            />
+    <PaperProvider>
+      <View style={globalStyles.base}>
+        <View style={style.header}>
+          <IconButton
+            icon="arrow-left"
+            color="#FFFFFF"
+            style={globalStyles.iconBack}
+            onPress={() => navigation.goBack()}
+            size={30}
+          />
+          <Text style={style.title}>Ingresa tus datos</Text>
+          <View style={globalStyles.viewR} />
+        </View>
+        <View style={style.cardNew}>
+          <ScrollView style={style.scroll}>
+            <View style={style.contenedor}>
+              <TextInput
+                label="Nombre"
+                onChangeText={(texto) => gNombre(texto)}
+                style={style.input}
+                value={nombre}
+                onSubmitEditing={(event) => {
+                  focusedTextInput(apellidoImp);
+                }}
+              />
+              <TextInput
+                label="Apellido"
+                onChangeText={(texto) => gApellido(texto)}
+                style={style.input}
+                value={apellido}
+                ref={apellidoImp}
+                onSubmitEditing={(event) => {
+                  focusedTextInput(emailRef);
+                }}
+              />
 
-            <TextInput
-              label="Email"
-              onChangeText={(texto) => gEmail(texto)}
-              style={style.input}
-              value={email}
-              ref={emailRef}
-              autoCapitalize="none"
-              onSubmitEditing={(event) => {
-                focusedTextInput(teleRef);
-              }}
-            />
-            <TextInput
-              label="Teléfono"
-              onChangeText={(texto) => gTelefono(texto)}
-              style={style.input}
-              value={telefono}
-              ref={teleRef}
-              keyboardType="numeric"
-              onSubmitEditing={(event) => {
-                focusedTextInput(passRef);
-              }}
-            />
-            <TextInput
-              label="Contraseña"
-              onChangeText={(texto) => gPassword(texto)}
-              style={style.input}
-              value={password}
-              secureTextEntry={true}
-              ref={passRef}
-              onSubmitEditing={(event) => {
-                focusedTextInput(RpassRef);
-              }}
-            />
+              <TextInput
+                label="Email"
+                onChangeText={(texto) => gEmail(texto)}
+                style={style.input}
+                value={email}
+                ref={emailRef}
+                autoCapitalize="none"
+                onSubmitEditing={(event) => {
+                  focusedTextInput(teleRef);
+                }}
+              />
+              <TextInput
+                label="Teléfono"
+                onChangeText={(texto) => gTelefono(texto)}
+                style={style.input}
+                value={telefono}
+                ref={teleRef}
+                keyboardType="numeric"
+                onSubmitEditing={(event) => {
+                  focusedTextInput(passRef);
+                }}
+              />
+              <TextInput
+                label="Contraseña"
+                onChangeText={(texto) => gPassword(texto)}
+                style={style.input}
+                value={password}
+                secureTextEntry={true}
+                ref={passRef}
+                onSubmitEditing={(event) => {
+                  focusedTextInput(RpassRef);
+                }}
+              />
 
-            <TextInput
-              label="Repetir contraseña"
-              onChangeText={(texto) => gPasswordRep(texto)}
-              style={style.input}
-              value={passwordRep}
-              ref={RpassRef}
-              secureTextEntry={true}
-            />
+              <TextInput
+                label="Repetir contraseña"
+                onChangeText={(texto) => gPasswordRep(texto)}
+                style={style.input}
+                value={passwordRep}
+                ref={RpassRef}
+                secureTextEntry={true}
+              />
 
-            <View style={style.Viewguardar}>
-              <Button
-                style={style.guardar}
-                mode="contained"
-                onPress={() => guardarUsuario()}>
-                Crear
-              </Button>
+              <View style={style.Viewguardar}>
+                <Button
+                  style={style.guardar}
+                  mode="contained"
+                  onPress={() => guardarUsuario()}>
+                  Crear
+                </Button>
+              </View>
             </View>
+          </ScrollView>
+        </View>
+        
+          <View>
+          <Portal>
+            <Dialog visible={alerta}>
+              <Dialog.Title >{titulo}</Dialog.Title>
+              <Dialog.Content>
+                <Paragraph >{mensaje}</Paragraph>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button
+                  mode="contained"
+                  onPress={() => {
+                    ingresarAlerta(false);
+                  }}>
+                  Ok
+                </Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
           </View>
-        </ScrollView>
       </View>
-    </View>
+    </PaperProvider>
   );
 };
 
