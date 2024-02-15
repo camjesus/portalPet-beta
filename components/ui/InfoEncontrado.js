@@ -18,7 +18,7 @@ function InfoEncontrado({visible, hideModal}) {
             <View>
 
             <Text style={infoStyle.sub}>Búsqueda</Text>
-            <Text style={infoStyle.texto}>En la espera de que lo encuentre su familia. Acordate de revisar si lo estan buscando en "Buscados"</Text>
+            <Text style={infoStyle.text}>En la espera de que lo encuentre su familia. Acordate de revisar si lo estan buscando en "Buscados"</Text>
             </View>
 
           </View>
@@ -29,14 +29,14 @@ function InfoEncontrado({visible, hideModal}) {
             </View>
             <View>
             <Text style={infoStyle.sub}>Entregado</Text>
-            <Text style={infoStyle.texto}>Comparte con nosotros si encontraste a su familia</Text>
+            <Text style={infoStyle.text}>Comparte con nosotros si encontraste a su familia</Text>
             </View>
             </View>
               </View>
               <Button
               labelStyle={infoStyle.label}
               style={infoStyle.guardar}
-              color="#F59822"
+              buttonColor="#F59822"
                 mode="contained"
                 onPress={() => hideModal()}>
                 Entendido

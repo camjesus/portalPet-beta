@@ -38,7 +38,7 @@ const infoStyle = StyleSheet.create({
       marginBottom: 15,
       marginTop: 10
     },
-    texto: {
+    text: {
       alignItems: 'flex-start',
       paddingHorizontal: 5,
     },

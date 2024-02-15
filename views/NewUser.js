@@ -18,36 +18,36 @@ import {AddnewUser} from '../store/actions/auth.action';
 import {useDispatch} from 'react-redux';
 
 const NewUser = ({navigation}) => {
-  const [nombre, gNombre] = useState('');
+  const [name, gName] = useState('');
   const [apellido, gApellido] = useState('');
   const [email, gEmail] = useState('');
   const [telefono, gTelefono] = useState('');
   const [password, gPassword] = useState('');
   const [passwordRep, gPasswordRep] = useState('');
-  const [alerta, ingresarAlerta] = useState(false);
-  const [mensaje, guardaMensaje] = useState('');
-  const [titulo, setTitulo] = useState('');
+  const [alert, setAlert] = useState(false);
+  const [message, setMessage] = useState('');
+  const [title, setTitulo] = useState('');
   const [resultadoCrear, setResultadoCrear] = useState(false);
   const apellidoImp = useRef();
   const emailRef = useRef();
   const RpassRef = useRef();
   const passRef = useRef();
   const teleRef = useRef();
-  const auth = FIREBASE_AUTH;
+  //const auth = FIREBASE_AUTH;
 
   const guardarUsuario = async () => {
     try{
     const ubicacion = '';
     if (
-      nombre === '' ||
+      name === '' ||
       apellido === '' ||
       email === '' ||
       password === '' ||
       telefono === ''
     ) {
       setTitulo('Validación');
-      guardaMensaje('Todos los campos son requeridos');
-      ingresarAlerta(true);
+      setMessage('Todos los campos son requeridos');
+      setAlert(true);
       return;
     }
     //password con una mayuscula , un numero y 8 caracteres
@@ -55,16 +55,16 @@ const NewUser = ({navigation}) => {
 
     if (reg.test(password) === false) {
       setTitulo('Validación');
-      guardaMensaje(
+      setMessage(
         'La contraseña debe tener 8 caracteres una mayúscula y un número',
       );
-      ingresarAlerta(true);
+      setAlert(true);
       return;
     }
     if (password !== passwordRep) {
       setTitulo('Validación');
-      guardaMensaje('Las contraseñas no coinciden');
-      ingresarAlerta(true);
+      setMessage('Las contraseñas no coinciden');
+      setAlert(true);
       return;
     }
     console.log('nuevoUsuario');
@@ -76,14 +76,14 @@ const NewUser = ({navigation}) => {
       ////GUARDO EN MI BASE DE DATOS USERS
       //const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
       //  uid: response.user.uid,
-      //  name: nombre,
+      //  name: name,
       //  lastname: apellido,
       //  email: email,
       //  ubication: null,
       //  phone: telefono
       //});
       const newUser = {
-        nombre,
+        name,
         apellido,
         email,
         password,
@@ -130,16 +130,16 @@ const NewUser = ({navigation}) => {
             <View style={style.contenedor}>
               <TextInput
                 label="Nombre"
-                onChangeText={(texto) => gNombre(texto)}
+                onChangeText={(text) => gName(text)}
                 style={style.input}
-                value={nombre}
+                value={name}
                 onSubmitEditing={(event) => {
                   focusedTextInput(apellidoImp);
                 }}
               />
               <TextInput
                 label="Apellido"
-                onChangeText={(texto) => gApellido(texto)}
+                onChangeText={(text) => gApellido(text)}
                 style={style.input}
                 value={apellido}
                 ref={apellidoImp}
@@ -150,7 +150,7 @@ const NewUser = ({navigation}) => {
 
               <TextInput
                 label="Email"
-                onChangeText={(texto) => gEmail(texto)}
+                onChangeText={(text) => gEmail(text)}
                 style={style.input}
                 value={email}
                 ref={emailRef}
@@ -161,7 +161,7 @@ const NewUser = ({navigation}) => {
               />
               <TextInput
                 label="Teléfono"
-                onChangeText={(texto) => gTelefono(texto)}
+                onChangeText={(text) => gTelefono(text)}
                 style={style.input}
                 value={telefono}
                 ref={teleRef}
@@ -172,7 +172,7 @@ const NewUser = ({navigation}) => {
               />
               <TextInput
                 label="Contraseña"
-                onChangeText={(texto) => gPassword(texto)}
+                onChangeText={(text) => gPassword(text)}
                 style={style.input}
                 value={password}
                 secureTextEntry={true}
@@ -184,7 +184,7 @@ const NewUser = ({navigation}) => {
 
               <TextInput
                 label="Repetir contraseña"
-                onChangeText={(texto) => gPasswordRep(texto)}
+                onChangeText={(text) => gPasswordRep(text)}
                 style={style.input}
                 value={passwordRep}
                 ref={RpassRef}
@@ -205,16 +205,16 @@ const NewUser = ({navigation}) => {
         
           <View>
           <Portal>
-            <Dialog visible={alerta}>
-              <Dialog.Title >{titulo}</Dialog.Title>
+            <Dialog visible={alert}>
+              <Dialog.Title >{title}</Dialog.Title>
               <Dialog.Content>
-                <Paragraph >{mensaje}</Paragraph>
+                <Paragraph >{message}</Paragraph>
               </Dialog.Content>
               <Dialog.Actions>
                 <Button
                   mode="contained"
                   onPress={() => {
-                    ingresarAlerta(false);
+                    setAlert(false);
                   }}>
                   Ok
                 </Button>
@@ -246,7 +246,7 @@ const style = StyleSheet.create({
     flex: 5,
   },
 
-  tituloTxt: {
+  titleTxt: {
     textAlign: 'center',
     fontSize: 35,
     color: '#252932',
@@ -271,7 +271,7 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
     color: '#252932',
   },
-  tituloIcon: {
+  titleIcon: {
     margin: 10,
   },
   viewTitulo: {

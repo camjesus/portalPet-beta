@@ -5,14 +5,14 @@ const Report = (props, route) => {
   const {params} = route;
   console.log(props.route.params);
   const {navigation} = props;
-  const {mascotaItem} = props.route.params;
+  const {pet} = props.route.params;
   const [denuncias, guardarDenuncias] = useState([]);
   const [userId, gUserId] = useState();
   const [otro, gOtro] = useState('');
   const [motivoID, gMotivoID] = useState(0);
   const [consultoDenuncias, gConsultoDenuncias] = useState(true);
   const [estilo, gEstilo] = useState(true);
-  const [alerta, ingresarAlerta] = useState(false);
+  const [alert, setAlert] = useState(false);
 
   useEffect(() => {
     console.log('pase por el effect');
@@ -36,7 +36,7 @@ const Report = (props, route) => {
   const enviarDenuncia = async () => {
     var newDenuncia = new FormData();
     newDenuncia.append('idMotivo', motivoID);
-    newDenuncia.append('idMascota', mascotaItem.id);
+    newDenuncia.append('idMascota', pet.id);
     newDenuncia.append('idPersona', userId);
     newDenuncia.append('otro', otro);
 
@@ -46,7 +46,7 @@ const Report = (props, route) => {
     const resultado = await axios.post(urdenuncia, newDenuncia);
     console.log(resultado);
 
-    ingresarAlerta(true);
+    setAlert(true);
   };
 
   return (

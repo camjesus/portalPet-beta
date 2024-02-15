@@ -16,7 +16,7 @@ const Filters = ({navigation, route}) => {
   console.log('filtros route');
   console.log(route);
 
-  const [edad, gEdad] = useState(30);
+  const [old, gOld] = useState(30);
   const [distancia, gDistancia] = useState(100);
   const [checkedMacho, setCheckedMacho] = React.useState(true);
   const [checkedHembra, setCheckedHembra] = React.useState(true);
@@ -31,32 +31,32 @@ const Filters = ({navigation, route}) => {
   const filtrosAnteriores = route.params.filtros._searchParams;
 
   const aplicarFiltros = (latitud, longitud) => {
-    params.append('estado', filtrosAnteriores[0][1]);
+    params.append('state', filtrosAnteriores[0][1]);
 
     if (checkedPeque) {
-      params.append('tamanio', 'CHICO');
+      params.append('size', 'small');
     }
     if (checkedMediano) {
-      params.append('tamanio', 'MEDIANO');
+      params.append('size', 'Medium');
     }
     if (checkedGrande) {
-      params.append('tamanio', 'GRANDE');
+      params.append('size', 'big');
     }
 
     if (checkedPerro) {
-      params.append('tipoMascota', 'PERRO');
+      params.append('type', 'dog');
     }
     if (checkedGato) {
-      params.append('tipoMascota', 'GATO');
+      params.append('type', 'cat');
     }
 
     if (checkedMacho) {
-      params.append('sexo', 'MACHO');
+      params.append('sex', 'male');
     }
     if (checkedHembra) {
-      params.append('sexo', 'HEMBRA');
+      params.append('sex', 'famale');
     }
-    params.append('edad', edad);
+    params.append('old', old);
 
     params.append("latitud",latitud);
     params.append("longitud",longitud);
@@ -79,7 +79,7 @@ const Filters = ({navigation, route}) => {
       await AsyncStorage.setItem('checkedPerro', JSON.stringify(checkedPerro));
       await AsyncStorage.setItem('checkedGato', JSON.stringify(checkedGato));
       await AsyncStorage.setItem('distancia', JSON.stringify(distancia));
-      await AsyncStorage.setItem('edad', JSON.stringify(edad));
+      await AsyncStorage.setItem('old', JSON.stringify(old));
     } catch (error) {
       console.log(error);
     }
@@ -127,8 +127,8 @@ const Filters = ({navigation, route}) => {
         gDistancia(parseInt(value));
       });
 
-      await AsyncStorage.getItem('edad').then((value) => {
-        gEdad(parseInt(value));
+      await AsyncStorage.getItem('old').then((value) => {
+        gOld(parseInt(value));
       });
     } catch (error) {
       console.log(error);
@@ -157,12 +157,12 @@ const Filters = ({navigation, route}) => {
       </View>
       <View style={style.contenedor}>
         <View style={style.labelTS}>
-          <Text style={style.titulo}>Tipo:</Text>
-          <Text style={style.titulo}>Sexo:</Text>
+          <Text style={style.title}>Tipo:</Text>
+          <Text style={style.title}>Sexo:</Text>
         </View>
         <View style={style.contenedorRowTS}>
-          <View style={style.mascotaRowTS}>
-          <View style={style.mascotaCol}>
+          <View style={style.petRowTS}>
+          <View style={style.petCol}>
             <Text style={style.textCheck}>Perro</Text>
             <Switch
               value={checkedPerro}
@@ -172,7 +172,7 @@ const Filters = ({navigation, route}) => {
               }}
             />
             </View>
-            <View style={style.mascotaCol}>
+            <View style={style.petCol}>
               <Text style={style.textCheck}>Gato</Text>
               <Switch
                 value={checkedGato}
@@ -183,8 +183,8 @@ const Filters = ({navigation, route}) => {
               />
             </View>
           </View>
-          <View style={style.mascotaRowTS}>
-          <View style={style.mascotaCol}>
+          <View style={style.petRowTS}>
+          <View style={style.petCol}>
             <Text style={style.textCheck}>Macho</Text>
             <Switch
               value={checkedMacho}
@@ -194,7 +194,7 @@ const Filters = ({navigation, route}) => {
               }}
             />
             </View>
-            <View style={style.mascotaCol}>
+            <View style={style.petCol}>
             <Text style={style.textCheck}>Hembra</Text>
             <Switch
               value={checkedHembra}
@@ -207,8 +207,8 @@ const Filters = ({navigation, route}) => {
           </View>
         </View>
         <Text style={{fontSize: 18, marginTop: 20}}>Tamaño:</Text>
-        <View style={style.mascotaRow}>
-        <View style={style.mascotaCol}>
+        <View style={style.petRow}>
+        <View style={style.petCol}>
           <Text style={style.textCheck}>Pequeño</Text>
           <Switch
             value={checkedPeque}
@@ -218,7 +218,7 @@ const Filters = ({navigation, route}) => {
             }}
           />
           </View>
-          <View style={style.mascotaCol}>
+          <View style={style.petCol}>
           <Text style={style.textCheck}>Mediano</Text>
           <Switch
             value={checkedMediano}
@@ -228,7 +228,7 @@ const Filters = ({navigation, route}) => {
             }}
           />
           </View>
-          <View style={style.mascotaCol}>
+          <View style={style.petCol}>
           <Text style={style.textCheck}>Grande</Text>
           <Switch
             value={checkedGrande}
@@ -242,16 +242,16 @@ const Filters = ({navigation, route}) => {
         <Text style={{fontSize: 18, marginTop: 20}}>Edad:</Text>
         <View style={style.sliderCont}>
           <Text style={style.text}>
-            {edad.toString()}
+            {old.toString()}
             {anios}
           </Text>
           <Slider
             step={1}
             maximumValue={30}
             onValueChange={(value) => {
-              gEdad(parseFloat(value));
+              gOld(parseFloat(value));
             }}
-            value={edad}
+            value={old}
             minimumTrackTintColor="#9575cd"
             maximumTrackTintColor="#f5bb05"
             thumbTintColor="#9575cd"
@@ -324,20 +324,20 @@ const style = StyleSheet.create({
     padding: 30,
     paddingTop: 20,
   },
-  mascotaRow: {
+  petRow: {
     flexDirection: 'row',
     paddingBottom: 8,
     alignItems: 'center',
     alignContent: 'center',
     justifyContent: 'space-evenly'
   },
-  mascotaCol: {
+  petCol: {
     flexDirection: 'column',
     alignItems: 'center',
     alignContent: 'center',
     paddingEnd: 9,
   },
-  mascotaRowTS: {
+  petRowTS: {
     flexDirection: 'row',
     paddingBottom: 8,
     flex: 2,
@@ -346,7 +346,7 @@ const style = StyleSheet.create({
     paddingTop: 8,
     marginStart: 5,
   },
-  titulo: {
+  title: {
     fontSize: 18,
     flex: 2,
   },

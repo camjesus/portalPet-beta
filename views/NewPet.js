@@ -15,174 +15,163 @@ import {
   IconButton,
   FAB,
 } from 'react-native-paper';
+import * as Crypto from "expo-crypto";
 import {CheckBox} from 'react-native-elements';
 import globalStyles from '../styles/global';
-import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../FirebaseConfig';
+import {AddNewPet} from '../store/actions/pet.action';
+import {useDispatch} from 'react-redux';
 import { collection, addDoc } from 'firebase/firestore';
-import { Camera, CameraType } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
 
 
 const NewPet = ({navigation, route, props}) => {
   console.log('route');
   console.log(route);
   const {params} = route;
-  const {mascotaItem} = params;
-  const [edit, setEdit] = useState(mascotaItem.id != null ? true : false);
-  const [nombre, gNombre] = useState(mascotaItem.nombre);
-  const [sexo, gSexo] = useState(mascotaItem.sexo);
-  const [tamanio, gTamanio] = useState(mascotaItem.tamanio);
-  const [descripcion, gDescripcion] = useState(mascotaItem.descripcion);
-  const [edad, gEdad] = useState(mascotaItem.edad.toString());
-  const [raza, gRaza] = useState('Mestizo');
-  const [tipoMascota, gTipoMascota] = useState(mascotaItem.tipoMascota);
-  const [longitud, gLongitud] = useState(mascotaItem.longitud);
-  const [latitud, gLatitud] = useState(mascotaItem.latitud);
-  const [rescatista, gRescatista] = useState(mascotaItem.rescatista);
-  const [accion, setAccion] = useState(mascotaItem.estado);
-  const [imagen, gImagen] = useState(null);
-  const [cambioFoto, setCambioFoto] = React.useState(
-    mascotaItem.cambioFoto === null ? false : mascotaItem.cambioFoto,
+  const {pet} = params;
+  const [edit, setEdit] = useState(pet.id != null ? true : false);
+  const [name, gName] = useState(pet.name);
+  const [sex, gSex] = useState(pet.sex);
+  const [size, setSize] = useState(pet.size);
+  const [aboutMe, gAboutMe] = useState(pet.aboutMe);
+  const [old, gOld] = useState(pet.old.toString());
+  const [type, gType] = useState(pet.type);
+  const [longitud, gLongitud] = useState(pet.longitud);
+  const [latitud, gLatitud] = useState(pet.latitud);
+  const [rescuer, gRescuer] = useState(pet.rescuer);
+  const [state, setState] = useState(pet.state);
+  const [changePhoto] = React.useState(
+    pet.changePhoto === null ? false : pet.changePhoto,
   );
-  console.log('mascotaItem');
-  console.log(mascotaItem);
+  console.log('pet');
+  console.log(pet);
 
+  const [checkedNoName, setCheckedNoName] = React.useState(false);
 
-  const [checkedAdefinir, setCheckedAdefinir] = React.useState(false);
-
-  const [alerta, ingresarAlerta] = useState(false);
-  const [mensaje, guardaMensaje] = useState('');
-  const [titulo, gTitulo] = useState('');
-  const [colorCamara, gColorCamara] = useState('#252932');
-  const [colorUbicacion, gColorUbicacion] = useState('#252932');
-
-  const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [image, setImage] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
-  const cameraRef = useRef(null);
+  const [alert, setAlert] = useState(false);
+  const [message, setMessage] = useState('');
+  const [title, setTitle] = useState('');
+  const [colorCamera, setColorCamera] = useState(pet.image_url == null ? '#252932' : '#FFFFFF' );
+  const [colorLocation] = useState(pet.longitud == null ? '#252932' : '#FFFFFF');
 
   const descRef = useRef();
-  const edadRef = useRef(mascotaItem.edad);
-  const mascotaItemRef = useRef(mascotaItem);
+  const oldRef = useRef(pet.old);
+  const petRef = useRef(pet.current);
   const colorSelect = '#f5bb05';
   const colorNoSelect = '#9575cd';
   const auth = FIREBASE_AUTH;
 
-  const savePet = async () => {
+  console.log('petRef');
+  console.log(petRef.current);
+
+  const savePet = async (pet) => {
     try {
-      if (nombre === '') {
-        gTitulo('Advertencia');
-        guardaMensaje('Es necesario ingresar un nombre');
-        ingresarAlerta(true);
+      if (name === '') {
+        setTitle('Advertencia');
+        setMessage('Es necesario ingresar un name');
+        setAlert(true);
         return;
       }
 
-      if (edad === '') {
-        gTitulo('Advertencia');
-        guardaMensaje('Es necesario ingrasar la edad');
-        ingresarAlerta(true);
+      if (old === '') {
+        setTitle('Advertencia');
+        setMessage('Es necesario ingrasar la old');
+        setAlert(true);
         return;
       }
 
-      if (descripcion === '') {
-        gTitulo('Advertencia');
-        guardaMensaje('Es necesario ingrasar una descripción');
-        ingresarAlerta(true);
+      if (aboutMe === '') {
+        setTitle('Advertencia');
+        setMessage('Es necesario ingrasar una descripción');
+        setAlert(true);
         return;
       }
 
-      if (imagen === null && mascotaItem.foto_url === null) {
-        gTitulo('Advertencia');
-        guardaMensaje('Es necesario cargar una foto para subir la mascota');
-        ingresarAlerta(true);
+      if (pet.image_url === null) {
+        setTitle('Advertencia');
+        setMessage('Es necesario cargar una foto para subir la pet');
+        setAlert(true);
       }
 
-      if (edad > 30) {
-        gTitulo('Advertencia');
-        guardaMensaje('La mascota no puede ser mayor a 30 años');
-        ingresarAlerta(true);
+      if (old > 30) {
+        setTitle('Advertencia');
+        setMessage('La mascota no puede ser mayor a 30 años');
+        setAlert(true);
         return;
       }
+      
+      //DESPUES LO REVERSO CUANDO SOLUCIONES View 'Map'
+      //if (latitud === '' || longitud === '') {
+      //  setTitle('Advertencia');
+      //  setMessage('Por favor indique en el mapa una dirección');
+      //  setAlert(true);
+      //  return;
+      //}
 
-      if (latitud === '' || longitud === '') {
-        gTitulo('Advertencia');
-        guardaMensaje('Por favor indique en el mapa una dirección');
-        ingresarAlerta(true);
-        return;
+      const newPetDB = {
+        active: true,
+        aboutMe: aboutMe,
+        old: parseInt(old),
+        state: state,
+        image_url: pet.image_url,
+        //id: pet.id !== null ? pet.id : Crypto.randomUUID(),
+        idAdopter: null,
+        latitud: latitud,
+        longitud: longitud,
+        name: name,
+        rescuer: rescuer,
+        rescuerId: rescuer.uid,
+        sex: sex,
+        size: size,
+        type: type,
+      };
+     
+      if (edit) {
+        console.log('pet id distinto de null');
       }
-      var bodyFormData = new FormData();
-      if (imagen !== null) {
-        bodyFormData.append('image', {
-          name: imagen.fileName,
-          type: imagen.type,
-          uri: imagen.uri,
-        });
-      }
-      bodyFormData.append('nombre', nombre);
-      bodyFormData.append('estado', accion);
-      bodyFormData.append('sexo', sexo);
-      bodyFormData.append('tamanio', tamanio);
-      bodyFormData.append('raza', raza);
-      bodyFormData.append('tipoMascota', tipoMascota);
-      bodyFormData.append('edad', parseInt(edad));
-      bodyFormData.append('descripcion', descripcion);
-      bodyFormData.append('latitud', latitud);
-      bodyFormData.append('longitud', longitud);
-      bodyFormData.append('cambioFoto', cambioFoto);
-      bodyFormData.append('rescatista', parseInt(rescatista));
-      if (mascotaItem.id !== null) {
-        bodyFormData.append('id', parseInt(mascotaItem.id));
-        bodyFormData.append('foto_url', mascotaItem.foto_url);
-      }
+      else {
+        console.log('newPetDB');
+        console.log(newPetDB);
+        //try{
+        //  //useDispatch(AddNewPet(newPetDB));
+//
+        //  if (edit) {
+        //    setTitle('Editar Mascota');
+        //    setMessage('La mascota se editó con éxito!');
+        //  } else {
+        //    setTitle('Nueva Mascota');
+        //    setMessage('La nueva mascota se creó con éxito!');
+        //  }
+//
+        //  setAlert(true);
+        //}catch (ex){
+        //  console.log(response);
+        //  setTitle('Nueva Mascota');
+        //  setMessage('Ha ocurrido un error, intente mas tarde');
+        //  setAlert(true);
+        //}
 
-      console.log('bodyFormData');
-      console.log(bodyFormData);
-      const urlUpload = constantes.BASE_URL + 'uploadPet';
-      axios
-        .request({
-          method: 'post',
-          url: urlUpload,
-          data: bodyFormData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .then(function (response) {
-          console.log('response');
-          console.log(response);
-          if (edit) {
-            if (cambioFoto) {
-              //updateFotoFirebase(response.data.foto_url, response.data.id);
-            }
-            gTitulo('Editar Mascota');
-            guardaMensaje('La mascota se editó con éxito!');
-          } else {
-            gTitulo('Nueva Mascota');
-            guardaMensaje('La nueva mascota se creó con éxito!');
+        try {
+          //GUARDO EN MI BASE DE DATOS PETS
+          const newDoc = addDoc(collection(FIREBASE_DB, 'pets'), newPetDB);
+          console.log(newDoc);
+          console.log('newPet');
+          setResultadoCrear(true);
+        }
+        catch(error){
+            console.log("eeror al crear mascota" + error.code + error.message);
+            console.log(error);
+            setResultadoCrear(false);
           }
+      }
+    }catch{
 
-          ingresarAlerta(true);
-        })
-        .catch(function (response) {
-          //handle error
-          console.log(response);
-          gTitulo('Nueva Mascota');
-          guardaMensaje('Ha ocurrido un error, intente mas tarde');
-          ingresarAlerta(true);
-        });
-    } catch (error) {
-      console.log(error);
-      gTitulo('Nueva Mascota');
-      guardaMensaje('Ha ocurrido un error, intente mas tarde');
-      ingresarAlerta(true);
     }
   };
 
-  const updateFotoFirebase = (newFoto, mascotaId) => {
+  const updateFotoFirebase = (newFoto, petId) => {
     db.collection('chats')
-      .where('idMascota', '==', mascotaId)
+      .where('idMascota', '==', petId)
       .onSnapshot((snapshot) => {
         console.log('snapshot');
         console.log(snapshot);
@@ -195,63 +184,64 @@ const NewPet = ({navigation, route, props}) => {
       });
   };
 
-  const abrirMapa = () => {
+  const openMap = () => {
     console.log('abrir Mapa ');
-    navigation.navigate('verMapa');
+    navigation.navigate('Map');
   };
 
   const openCamera = () => {
     console.log('abrir camara ');
-    navigation.navigate('MyCamera', { mascotaItem : mascotaItem });
+    navigation.navigate('MyCamera', { pet : pet });
   };
 
   useEffect(() => {
     console.log('entro a useEffec con coordenadas ' + route);
     AsyncStorage.getItem('userId').then((value) => {
-      gRescatista(value);
+      gRescuer(value);
     });
     if (route.params?.coordinates) {
       console.log(route.params?.coordinates);
       gLatitud(route.params?.coordinates.latitude);
       gLongitud(route.params?.coordinates.longitude);
-      gColorUbicacion('#FFFFFF');
     }
   }, [route.params?.coordinates]);
-  
-  useEffect(() => {
-    if (checkedAdefinir) {
-      if (accion === 'ENCONTRADO') {
-        console.log(nombre);
-        gNombre('Sin Collar');
-      } else {
-        console.log(nombre);
-        gNombre('A definir');
-      }
-    } else {
-      console.log(nombre);
-      gNombre('');
-    }
-  }, [checkedAdefinir]);
 
   useEffect(() => {
-    if (mascotaItem.id !== null) {
-      if (
-        mascotaItem.nombre == 'A definir' ||
-        mascotaItem.nombre == 'Sin Collar'
-      ) {
-        setCheckedAdefinir(true);
+   if(pet.image_url != null)
+   {
+    setColorCamera('#FFFFFF');
+   }
+  }, [pet.image_url]);
+  
+  useEffect(() => {
+    if (checkedNoName) {
+      if (state === 'found') {
+        console.log(name);
+        gName('Sin Collar');
+      } else {
+        console.log(name);
+        gName('Sin Nombre');
       }
-      gColorUbicacion('#FFFFFF');
-      gColorCamara('#FFFFFF');
+    } else {
+      console.log(name);
+      gName(null);
+    }
+    console.log('petupdate');
+    console.log(pet);
+  }, [checkedNoName]);
+
+  useEffect(() => {
+    if (pet.id !== null) {
+      if (
+        pet.name == 'Sin Nombre' ||
+        pet.name == 'Sin Collar'
+      ) {
+        setCheckedNoName(true);
+      }
     }
   }, []);
   const focusedTextInput = (ref) => {
     ref.current.focus();
-  };
-
-  function toggleCameraType() {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-    takePicture();
   };
 
   return (
@@ -265,10 +255,10 @@ const NewPet = ({navigation, route, props}) => {
             onPress={() => navigation.goBack()}
             size={30}
           />
-          {mascotaItem.id === null && (
+          {pet.id === null && (
             <Text style={globalStyles.title}>Nueva mascota</Text>
           )}
-          {mascotaItem.id !== null && (
+          {pet.id !== null && (
             <Text style={globalStyles.title}>Editar mascota</Text>
           )}
           <IconButton
@@ -282,30 +272,19 @@ const NewPet = ({navigation, route, props}) => {
         <View style={globalStyles.base}>
           <View style={globalStyles.contenedor}>
             <View style={style.avatar}>
-              {cambioFoto === true && (
                 <Avatar.Image
                   size={190}
                    source={{
-                    uri: mascotaItem.foto_url,
+                    uri: pet.image_url,
                   }}
                   style={style.avatarImage}
                 />
-              )}
-
-              {cambioFoto === false && (
-                <Image
-                  style={style.avatarImage}
-                  source={{
-                    uri: mascotaItem.foto_url,
-                  }}
-                />
-              )}
             </View>
             <View style={style.viewRowIcon}>
               <FAB
                 icon="camera"
                 style={style.fabLeft}
-                color={colorCamara}
+                color={colorCamera}
                 onPress={() => openCamera()}
                 animated="true"
                 small
@@ -313,9 +292,9 @@ const NewPet = ({navigation, route, props}) => {
               <FAB
                 icon="map-marker-plus"
                 style={style.fabRight}
-                color={colorUbicacion}
+                color={colorLocation}
                 small
-                onPress={() => abrirMapa()}
+                onPress={() => openMap()}
                 animated="true"
               />
             </View>
@@ -324,27 +303,27 @@ const NewPet = ({navigation, route, props}) => {
                 style={style.buttonGL}
                 mode="contained"
                 compact={true}
-                color={accion === 'ADOPCION' ? colorSelect : colorNoSelect}
+                buttonColor={state === 'inAdoption' ? colorSelect : colorNoSelect}
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setAccion('ADOPCION')}>
+                onPress={() => setState('inAdoption')}>
                 Adopción
               </Button>
               <Button
                 style={style.buttonG}
                 mode="contained"
-                color={accion === 'ENCONTRADO' ? colorSelect : colorNoSelect}
+                buttonColor={state === 'found' ? colorSelect : colorNoSelect}
                 compact={true}
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setAccion('ENCONTRADO')}>
+                onPress={() => setState('found')}>
                 Encontrado
               </Button>
               <Button
                 style={style.buttonGR}
                 mode="contained"
-                color={accion === 'BUSCADO' ? colorSelect : colorNoSelect}
+                buttonColor={state === 'wanted' ? colorSelect : colorNoSelect}
                 compact={true}
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setAccion('BUSCADO')}>
+                onPress={() => setState('wanted')}>
                 Buscado
               </Button>
             </View>
@@ -352,10 +331,10 @@ const NewPet = ({navigation, route, props}) => {
               <View style={style.rowNombre}>
                 <TextInput
                   label="Nombre"
-                  value={nombre}
-                  onChangeText={(texto) => gNombre(texto)}
+                  value={name}
+                  onChangeText={(text) => gName(text)}
                   style={style.inputNombre}
-                  disabled={checkedAdefinir}
+                  disabled={checkedNoName}
                   onSubmitEditing={(event) => {
                     focusedTextInput(descRef);
                   }}
@@ -363,58 +342,58 @@ const NewPet = ({navigation, route, props}) => {
                 <View style={style.rowadefinir}>
                   <CheckBox
                     right
-                    title={accion === 'ENCONTRADO' ? 'Sin Collar' : 'A definir'}
+                    title={state === 'found' ? 'Sin Collar' : 'Sin Nombre'}
                     containerStyle={style.checkStyle}
                     checkedIcon="dot-circle-o"
                     uncheckedIcon="circle-o"
                     checkedColor="#9575cd"
-                    checked={checkedAdefinir}
+                    checked={checkedNoName}
                     onPress={() => {
-                      setCheckedAdefinir(!checkedAdefinir);
+                      setCheckedNoName(!checkedNoName);
                     }}
                   />
                 </View>
               </View>
               <TextInput
-                label={'Descripción (' + (200 - descripcion.length) + ')'}
-                value={descripcion}
-                onChangeText={(texto) => gDescripcion(texto)}
+                label={'Descripción (' + (200 - aboutMe.length) + ')'}
+                value={aboutMe}
+                onChangeText={(text) => gAboutMe(text)}
                 style={style.input}
                 ref={descRef}
                 maxLength={200}
                 multiline={true}
                 onSubmitEditing={(event) => {
-                  focusedTextInput(edadRef);
+                  focusedTextInput(oldRef);
                 }}
               />
 
               <TextInput
                 label="Edad"
-                value={edad}
+                value={old}
                 keyboardType="numeric"
-                onChangeText={(texto) => gEdad(texto)}
+                onChangeText={(text) => gOld(text)}
                 style={style.input}
-                ref={edadRef}
+                ref={oldRef}
               />
             </View>
             <View style={style.containerCheck}>
               <View style={style.viewCheck}>
-                <View style={style.mascotaRowText}>
-                  <Text style={style.titulo}>Tipo:</Text>
+                <View style={style.petRowText}>
+                  <Text style={style.title}>Tipo:</Text>
 
-                  <Text style={style.tituloright}>Sexo:</Text>
+                  <Text style={style.titleright}>Sexo:</Text>
                 </View>
-                <View style={style.mascotaRowTipoSexo}>
+                <View style={style.petRowTipoSexo}>
                   <View style={style.buttonGroupS}>
                     <Button
                       style={style.buttonGLS}
                       mode="contained"
-                      color={
-                        tipoMascota === 'PERRO' ? colorSelect : colorNoSelect
+                      buttonColor={
+                        type === 'dog' ? colorSelect : colorNoSelect
                       }
                       compact={true}
                       labelStyle={style.labelStyleGroup}
-                      onPress={() => gTipoMascota('PERRO')}>
+                      onPress={() => gType('dog')}>
                       Perro
                     </Button>
                     <Button
@@ -422,10 +401,10 @@ const NewPet = ({navigation, route, props}) => {
                       mode="contained"
                       compact={true}
                       labelStyle={style.labelStyleGroup}
-                      color={
-                        tipoMascota === 'GATO' ? colorSelect : colorNoSelect
+                      buttonColor={
+                        type === 'cat' ? colorSelect : colorNoSelect
                       }
-                      onPress={() => gTipoMascota('GATO')}>
+                      onPress={() => gType('cat')}>
                       Gato
                     </Button>
                   </View>
@@ -434,9 +413,9 @@ const NewPet = ({navigation, route, props}) => {
                       style={style.buttonGLS}
                       mode="contained"
                       compact={true}
-                      color={sexo === 'MACHO' ? colorSelect : colorNoSelect}
+                      buttonColor={sex === 'male' ? colorSelect : colorNoSelect}
                       labelStyle={style.labelStyleGroup}
-                      onPress={() => gSexo('MACHO')}>
+                      onPress={() => gSex('male')}>
                       MACHO
                     </Button>
                     <Button
@@ -444,24 +423,24 @@ const NewPet = ({navigation, route, props}) => {
                       compact={true}
                       mode="contained"
                       labelStyle={style.labelStyleGroup}
-                      color={sexo === 'HEMBRA' ? colorSelect : colorNoSelect}
-                      onPress={() => gSexo('HEMBRA')}>
+                      buttonColor={sex === 'famale' ? colorSelect : colorNoSelect}
+                      onPress={() => gSex('famale')}>
                       Hembra
                     </Button>
                   </View>
                 </View>
               </View>
-              <View style={style.mascotaRowText}>
-                <Text style={style.titulo}>Tamaño:</Text>
+              <View style={style.petRowText}>
+                <Text style={style.title}>Tamaño:</Text>
               </View>
               <View style={style.buttonGroupT}>
                 <Button
                   style={style.buttonGL}
                   mode="contained"
-                  color={tamanio === 'CHICO' ? colorSelect : colorNoSelect}
+                  buttonColor={size === 'small' ? colorSelect : colorNoSelect}
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  onPress={() => gTamanio('CHICO')}>
+                  onPress={() => setSize('small')}>
                   chico
                 </Button>
                 <Button
@@ -469,8 +448,8 @@ const NewPet = ({navigation, route, props}) => {
                   mode="contained"
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  color={tamanio === 'MEDIANO' ? colorSelect : colorNoSelect}
-                  onPress={() => gTamanio('MEDIANO')}>
+                  buttonColor={size === 'Medium' ? colorSelect : colorNoSelect}
+                  onPress={() => setSize('Medium')}>
                   Mediano
                 </Button>
                 <Button
@@ -478,9 +457,9 @@ const NewPet = ({navigation, route, props}) => {
                   mode="contained"
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  color={tamanio === 'GRANDE' ? colorSelect : colorNoSelect}
+                  buttonColor={size === 'big' ? colorSelect : colorNoSelect}
                   animated={false}
-                  onPress={() => gTamanio('GRANDE')}>
+                  onPress={() => setSize('big')}>
                   grande
                 </Button>
               </View>
@@ -490,24 +469,24 @@ const NewPet = ({navigation, route, props}) => {
               mode="contained"
               labelStyle={{color: '#FFFFFF'}}
               compact={true}
-              onPress={() => savePet()}>
+              onPress={() => savePet(pet)}>
               Guardar
             </Button>
             <PaperProvider>
               <View>
                 <Portal>
-                    <Dialog visible={alerta} style={globalStyles.dialog}>
-                      <Dialog.Title style={globalStyles.dialogTitle}>
-                        {titulo}
+                    <Dialog visible={alert} style={globalStyles.dialog}>
+                      <Dialog.Title style={globalStyles.dialosetTitle}>
+                        {title}
                       </Dialog.Title>
                       <Dialog.Content style={globalStyles.dialogMsj}>
-                        <Paragraph>{mensaje}</Paragraph>
+                        <Paragraph>{message}</Paragraph>
                       </Dialog.Content>
                       <Dialog.Actions>
                         <Button
                           onPress={() => {
-                            ingresarAlerta(false);
-                            if (titulo !== 'Advertencia') {
+                            setAlert(false);
+                            if (title !== 'Advertencia') {
                               navigation.navigate('MyPets', {
                                 consultarMascotas: true,
                               });
@@ -644,16 +623,16 @@ const style = StyleSheet.create({
     fontSize: 13,
     flex: 2,
   },
-  tituloright: {
+  titleright: {
     fontSize: 16,
     flex: 6,
   },
-  mascotaRowText: {
+  petRowText: {
     flexDirection: 'row',
     top: 10,
     justifyContent: 'space-between',
   },
-  mascotaRowTipoSexo: {
+  petRowTipoSexo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
@@ -667,14 +646,14 @@ const style = StyleSheet.create({
     paddingTop: 8,
     marginStart: 15,
   },
-  titulo: {
+  title: {
     fontSize: 16,
     flex: 6,
   },
   textChEdad: {
     paddingTop: 8,
   },
-  edad: {
+  old: {
     width: '50%',
   },
   textCheckEdad: {

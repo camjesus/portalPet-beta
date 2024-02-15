@@ -27,7 +27,7 @@ export const AddnewUser = (newUser) => {
     //GUARDO EN MI BASE DE DATOS USERS
     const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
       uid: response.user.uid,
-      name: nombre,
+      name: name,
       lastname: apellido,
       email: email,
       ubication: null,

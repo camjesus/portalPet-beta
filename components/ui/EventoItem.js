@@ -10,11 +10,11 @@ const EventoItem = ({evento}) => {
   const espacio = ' - ';
 
   return (
-    <Card style={style.titulo}>
+    <Card style={style.title}>
       <View style={style.viewHeader}>
         <View>
           <Maticons
-            style={style.tituloIcon}
+            style={style.titleIcon}
             name="calendar-week"
             size={40}
             color="#252932"
@@ -25,24 +25,24 @@ const EventoItem = ({evento}) => {
       <View style={style.viewEvento}>
         <View style={style.viewDesc}>
           <View style={style.viewRow}>
-            <Text style={style.nombreText}>Dirección: </Text>
-            <Text style={style.descripcionText}>{evento.direccion}</Text>
+            <Text style={style.nameText}>Dirección: </Text>
+            <Text style={style.aboutMeText}>{evento.direccion}</Text>
           </View>
 
           <View style={style.viewRow}>
-            <Text style={style.nombreText}>Barrio: </Text>
-            <Text style={style.descripcionText}>{evento.barrio}</Text>
+            <Text style={style.nameText}>Barrio: </Text>
+            <Text style={style.aboutMeText}>{evento.barrio}</Text>
           </View>
           <View style={style.viewRow}>
-            <Text style={style.nombreText}>Día y Horario: </Text>
-            <Text style={style.descripcionText}>
+            <Text style={style.nameText}>Día y Horario: </Text>
+            <Text style={style.aboutMeText}>
               {evento.dias}
               {espacio}
               {evento.horarios}
             </Text>
           </View>
           <View style={style.viewRow}>
-            <Text style={style.nombreText}>Descripción: </Text>
+            <Text style={style.nameText}>Descripción: </Text>
             <Text style={style.textLargo}>{evento.consultas}</Text>
           </View>
         </View>
@@ -52,17 +52,17 @@ const EventoItem = ({evento}) => {
 };
 
 const style = StyleSheet.create({
-  titulo: {
+  title: {
     margin: 10,
     justifyContent: 'center',
     flexDirection: 'row',
     backgroundColor: '#ffffff',
   },
-  nombreText: {
+  nameText: {
     fontWeight: 'bold',
     color: '#252932',
   },
-  descripcionText: {
+  aboutMeText: {
     fontSize: 13,
     color: '#252932',
     textTransform: 'capitalize',
@@ -79,7 +79,7 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  tituloIcon: {
+  titleIcon: {
     margin: 10,
   },
   viewRow: {

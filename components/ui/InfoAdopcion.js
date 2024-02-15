@@ -20,7 +20,7 @@ function InfoAdopcion({visible, hideModal}) {
             </View>
             <View>
               <Text style={infoStyle.sub}>Búsqueda</Text>
-              <Text style={infoStyle.texto}>
+              <Text style={infoStyle.text}>
                 La mascota esta en bùsqueda de su nueva familia
               </Text>
             </View>
@@ -34,7 +34,7 @@ function InfoAdopcion({visible, hideModal}) {
             </View>
             <View>
               <Text style={infoStyle.sub}>Adaptación</Text>
-              <Text style={infoStyle.texto}>
+              <Text style={infoStyle.text}>
                 Es un periodo de mínimo 15 días para que la mascota y su nueva
                 familia se conozcan y que sean compatibles
               </Text>
@@ -49,7 +49,7 @@ function InfoAdopcion({visible, hideModal}) {
             </View>
             <View>
               <Text style={infoStyle.sub}>Adoptado</Text>
-              <Text style={infoStyle.texto}>Tu mascota consiguió su nuevo hogar!</Text>
+              <Text style={infoStyle.text}>Tu mascota consiguió su nuevo hogar!</Text>
             </View>
           </View>
         </View>

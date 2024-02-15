@@ -54,7 +54,7 @@ export default class LoginFBKMgr extends Component {
                     )
                     .then((resp) => {
                       if (resp.data.id === null) {
-                        alert('Usuario no encontrado');
+                        alert('Usuario no found');
                       } else {
                         saveUserInStorage(resp.data);
                       }
@@ -76,7 +76,7 @@ export default class LoginFBKMgr extends Component {
             const saveUserInStorage = async (user) => {
               try {
                 console.log('ENTRE user storage login fb');
-                await AsyncStorage.setItem('nombre', user.nombre);
+                await AsyncStorage.setItem('name', user.name);
                 await AsyncStorage.setItem('apellido', user.apellido);
                 // await AsyncStorage.setItem('telefono', user.telefono);
                 await AsyncStorage.setItem('email', user.email);

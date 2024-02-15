@@ -8,38 +8,43 @@ import {Text, Card, IconButton} from 'react-native-paper';
 import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useIsFocused} from '@react-navigation/native';
-import constantes from '../components/context/Constantes';
 
 const MyPets = (props) => {
   const {navigation} = props;
-  const [mascotas, guardarMascotas] = useState([]);
-  const [userId, gUserId] = useState('');
+  const [pets, guardarMascotas] = useState([]);
+  const [userId, setUserId] = useState('');
+  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const rescuer = {
+    uid: userId,
+    name: name,
+    lastName: lastName
+  };
   const newMascota = {
-    activa: true,
-    cambioFoto: true,
-    descripcion: '',
-    edad: '',
-    estado: 'ADOPCION',
+    active: true,
+    changePhoto: true,
+    aboutMe: '',
+    old: '',
+    state: 'inAdoption',
     fechaCalculo: null,
     fechaFin: null,
     fechaInicio: null,
-    fechaInicioS: null,
-    foto_url: null,
+    //fechaInicioS: null,
+    image_url: null,
     id: null,
     idAdoptante: null,
     image: null,
     latitud: null,
     longitud: null,
-    nombre: null,
-    raza: null,
-    rescatista: null,
-    rescatistaId: null,
-    sexo: 'MACHO',
-    tamanio: 'CHICO',
-    tipoMascota: 'PERRO',
+    name: null,
+    rescuer: rescuer,
+    rescuerId: userId,
+    sex: 'male',
+    size: 'small',
+    type: 'dog',
   };
 
-  const [consultarMascotas, gConsMascotaApi] = useState(false); //si adopto una mascota es para saber si recargo la pagina
+  const [consultarMascotas, gConsMascotaApi] = useState(false); //si adopto una pet es para saber si recargo la pagina
   const isFocused = useIsFocused(); //devuelve true si la pantalla tiene foco
 
   //const id = route.params;
@@ -51,9 +56,15 @@ const MyPets = (props) => {
 
   const obtenerDatosStorage = async () => {
     try {
+      await AsyncStorage.getItem('name').then((value) => {
+        setName(value);
+      });
+      await AsyncStorage.getItem('lastname').then((value) => {
+        setLastName(value);
+      });
       await AsyncStorage.getItem('uid').then((value) => {
-        gUserId(value);
-        //voy a buscar las mascotas una vez que tengo cargado el id, ya que es asincrono
+        setUserId(value);
+        //voy a buscar las pets una vez que tengo cargado el id, ya que es asincrono
         obtenerMascotas(value);
       });
     } catch (error) {
@@ -100,7 +111,7 @@ const MyPets = (props) => {
           style={styles.iconEdit}
           onPress={() => {
             navigation.navigate('NewPet', {
-              mascotaItem: newMascota,
+              pet: newMascota,
             });
           }}
           size={30}
@@ -108,7 +119,7 @@ const MyPets = (props) => {
       </View>
       <View>
         <View>
-          {mascotas.length === 0 && (
+          {pets.length === 0 && (
             <Text style={globalStyles.msjAdvertencia}>
               Aún no cargaste mascotas
             </Text>
@@ -117,10 +128,10 @@ const MyPets = (props) => {
       </View>
 
       <FlatList
-        data={mascotas}
+        data={pets}
         renderItem={({item}) => (
           <MascotaItem
-            mascota={item}
+            pet={item}
             consultarMascotas={gConsMascotaApi}
             navigation={navigation}
           />
@@ -134,7 +145,7 @@ const MyPets = (props) => {
           color="#FFFFFF"
           onPress={() => {
             navigation.navigate('NewPet', {
-              mascotaItem: newMascota,
+              pet: newMascota,
             });
           }}
           animated="true"
@@ -151,14 +162,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: '#9575cd',
   },
-  titulo: {
+  title: {
     margin: 10,
     justifyContent: 'center',
     padding: 10,
     flexDirection: 'row',
     backgroundColor: '#ffffff',
   },
-  tituloTxt: {
+  titleTxt: {
     textAlign: 'center',
     fontSize: 35,
     color: '#252932',
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  tituloIcon: {
+  titleIcon: {
     margin: 10,
   },
   iconEdit: {

@@ -1,7 +1,7 @@
 import {NEW_PET} from '../actions/pet.action';
 
 const INITIAL_STATE = {
-  userId: null,
+  pet: null,
 };
 
 const PetReducer = (state = INITIAL_STATE, action) => {
@@ -9,7 +9,7 @@ const PetReducer = (state = INITIAL_STATE, action) => {
     case NEW_PET:
       return {
         ...state,
-        userId: action.user.userId,
+        pet: action.pet,
       };
     default:
       return state;

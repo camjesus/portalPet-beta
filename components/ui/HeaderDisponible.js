@@ -3,7 +3,7 @@ import {Text, IconButton} from 'react-native-paper';
 import {View} from 'react-native';
 import SearchType from './SearchType';
 
-const HeaderDisponible = ({heandlePress, goToFiltros, estado, styles, setEstado}) => {
+const HeaderDisponible = ({heandlePress, goToFiltros, state, styles, setEstado}) => {
   return (
     <View>
     <View style={styles.header}>
@@ -23,7 +23,7 @@ const HeaderDisponible = ({heandlePress, goToFiltros, estado, styles, setEstado}
           size={30}
         />
       </View>
-      <SearchType estado={estado} setEstado={setEstado} styles={styles} />
+      <SearchType state={state} setEstado={setEstado} styles={styles} />
       </View>
   );
 };

@@ -4,11 +4,11 @@ import ImagePicker from 'react-native-image-picker';
 import {FAB} from 'react-native-paper';
 
 function ImageSelector({
-  colorCamara,
-  setCambioFoto,
+  colorCamera,
+  setChangePhoto,
   gColorCamara,
   onImageSelected,
-  mascotaItem,
+  pet,
 }) {
   const selectPhotoTapped = async () => {
     const options = {
@@ -72,8 +72,8 @@ function ImageSelector({
         console.log('User tapped custom button: ', response.customButton);
       } else {
         onImageSelected(response);
-        mascotaItem.foto_url = null;
-        setCambioFoto(true);
+        pet.image_url = null;
+        setChangePhoto(true);
         gColorCamara('#FFFFFF');
       }
     });
@@ -83,7 +83,7 @@ function ImageSelector({
     <FAB
       icon="camera"
       style={styles.fabLeft}
-      color={colorCamara}
+      color={colorCamera}
       onPress={() => selectPhotoTapped()}
       animated="true"
       small

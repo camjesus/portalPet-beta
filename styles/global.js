@@ -6,7 +6,7 @@ const globalStyles = StyleSheet.create({
     marginTop: 20,
     marginHorizontal: '2.5%',
   },
-  titulo: {
+  title: {
     textAlign: 'center',
     marginVertical: 20,
     fontSize: 50,
@@ -75,7 +75,7 @@ const globalStyles = StyleSheet.create({
     elevation: 10,
     shadowOffset: {width: 1, height: 13},
   },
-  dialogTitle: {
+  dialosetTitle: {
     color: '#9575cd',
     fontSize: 20,
   },

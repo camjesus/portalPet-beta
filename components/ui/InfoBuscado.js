@@ -20,7 +20,7 @@ function InfoBuscado({visible, hideModal}) {
             </View>
             <View>
               <Text style={infoStyle.sub}>Búsqueda</Text>
-              <Text style={infoStyle.texto}>
+              <Text style={infoStyle.text}>
                 Estamos en busqueda de noticias. Entre todxs lo encontraremos
               </Text>
             </View>
@@ -34,7 +34,7 @@ function InfoBuscado({visible, hideModal}) {
             </View>
             <View>
               <Text style={infoStyle.sub}>Encontrado</Text>
-              <Text style={infoStyle.texto}>
+              <Text style={infoStyle.text}>
                 Comparte con nosotros que has encontrado tu mascota!
               </Text>
             </View>

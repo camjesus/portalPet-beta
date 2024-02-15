@@ -12,18 +12,18 @@ import {
 import globalStyles from '../styles/global';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const Account = ({navigation}) => {
-  const [nombre, gNombre] = useState('');
+  const [name, gName] = useState('');
   const [apellido, gApellido] = useState('');
   const [email, gEmail] = useState('');
   const [telefono, gTelefono] = useState('');
   const [camposEdit, gCamposEdit] = useState(true);
   const [iconoRight, setIconoRight] = useState('pencil');
-  const [alerta, ingresarAlerta] = useState(false);
-  const [mensaje, guardaMensaje] = useState('');
+  const [alert, setAlert] = useState(false);
+  const [message, setMessage] = useState('');
   const [editoCampos, setEditoCampos] = useState(false);
 
   const usuario = {
-    nombre,
+    name,
     apellido,
     email,
     password: null,
@@ -51,7 +51,7 @@ const Account = ({navigation}) => {
       });
 
       await AsyncStorage.getItem('name').then((value) => {
-        gNombre(
+        gName(
           value.substring(0, 1).toUpperCase() +
             value.substring(1, value.length),
         );
@@ -72,26 +72,26 @@ const Account = ({navigation}) => {
     }
   };
 
-  const editarUsuario = async (icono) => {
+  const editUsuario = async (icono) => {
     if (editoCampos && icono === 'check') {
       if (telefono.length !== 10) {
-        guardaMensaje('El número de teléfono es inválido, verifique los datos');
-        ingresarAlerta(true);
+        setMessage('El número de teléfono es inválido, verifique los datos');
+        setAlert(true);
         return;
       }
       try {
         //agregar update al firebase
-          await AsyncStorage.setItem('name', usuario.nombre);
+          await AsyncStorage.setItem('name', usuario.name);
           await AsyncStorage.setItem('lastname', usuario.apellido);
           await AsyncStorage.setItem('phone', usuario.telefono);
           await AsyncStorage.setItem('email', usuario.email);
-          guardaMensaje('El usuario se editó con éxito');
-          ingresarAlerta(true);
+          setMessage('El usuario se editó con éxito');
+          setAlert(true);
 
       } catch (error) {
         console.log(error);
-        guardaMensaje('Error al editar el usuario');
-        ingresarAlerta(true);
+        setMessage('Error al edit el usuario');
+        setAlert(true);
         return;
       }
       initialValues();
@@ -120,7 +120,7 @@ const Account = ({navigation}) => {
             } else {
               setIconoRight('check');
             }
-            editarUsuario(iconoRight);
+            editUsuario(iconoRight);
           }}
           size={30}
         />
@@ -130,9 +130,9 @@ const Account = ({navigation}) => {
           <View style={style.contenedor}>
             <TextInput
               label="Nombre"
-              value={nombre}
-              onChangeText={(texto) => {
-                gNombre(texto);
+              value={name}
+              onChangeText={(text) => {
+                gName(text);
                 setEditoCampos(true);
               }}
               style={style.input}
@@ -141,8 +141,8 @@ const Account = ({navigation}) => {
             <TextInput
               label="Apellido"
               value={apellido}
-              onChangeText={(texto) => {
-                gApellido(texto);
+              onChangeText={(text) => {
+                gApellido(text);
                 setEditoCampos(true);
               }}
               style={style.input}
@@ -151,8 +151,8 @@ const Account = ({navigation}) => {
             <TextInput
               label="Teléfono"
               value={telefono}
-              onChangeText={(texto) => {
-                gTelefono(texto);
+              onChangeText={(text) => {
+                gTelefono(text);
                 setEditoCampos(true);
               }}
               style={style.input}
@@ -171,7 +171,7 @@ const Account = ({navigation}) => {
               mode="contained"
               compact={true}
               disabled={!editoCampos}
-              onPress={() => editarUsuario(iconoRight)}>
+              onPress={() => editUsuario(iconoRight)}>
               Editar
             </Button>
           </View>
@@ -198,7 +198,7 @@ const style = StyleSheet.create({
     justifyContent: 'space-evenly',
     margin: 10,
   },
-  tituloTxt: {
+  titleTxt: {
     textAlign: 'center',
     fontSize: 35,
     color: '#252932',

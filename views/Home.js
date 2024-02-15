@@ -11,10 +11,10 @@ const Home = ({navigation, route, props}) => {
   const data = route.params;
   console.log('params');
   console.log(data?.data);
-  const [mascotasDisp, gDisponibles] = useState([]);
+  const [petsDisp, gDisponibles] = useState([]);
   const [primerCarga, gPrimerCarga] = useState(true);
   const [consultarHome, gConsHome] = useState(true);
-  const [estado, setEstado] = useState('ADOPCION');
+  const [state, setEstado] = useState('inAdoption');
   const isFirstTime = useRef(true);
   const [distancia] = useState(100);
   const paramsDefault = new URLSearchParams();
@@ -22,16 +22,16 @@ const Home = ({navigation, route, props}) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
-  //Botones accion mascota
+  //Botones accion pet
 
-  paramsDefault.append('sexo', 'MACHO');
-  paramsDefault.append('sexo', 'HEMBRA');
-  paramsDefault.append('edad', 30);
-  paramsDefault.append('tamanio', 'CHICO');
-  paramsDefault.append('tamanio', 'MEDIANO');
-  paramsDefault.append('tamanio', 'GRANDE');
-  paramsDefault.append('tipoMascota', 'PERRO');
-  paramsDefault.append('tipoMascota', 'GATO');
+  paramsDefault.append('sex', 'male');
+  paramsDefault.append('sex', 'famale');
+  paramsDefault.append('old', 30);
+  paramsDefault.append('size', 'small');
+  paramsDefault.append('size', 'Medium');
+  paramsDefault.append('size', 'big');
+  paramsDefault.append('type', 'dog');
+  paramsDefault.append('type', 'cat');
   paramsDefault.append('distancia', distancia);
 
   useEffect(() => {
@@ -53,13 +53,13 @@ const Home = ({navigation, route, props}) => {
 
   useEffect(() => {
     gConsHome(true);
-  }, [estado]);
+  }, [state]);
 
   const onSwiped = () => {
     console.log(index + 1);
-    console.log(mascotasDisp.length);
+    console.log(petsDisp.length);
     setIndex(index + 1);
-    if (mascotasDisp.length === index) {
+    if (petsDisp.length === index) {
       gConsHome(true);
     }
   };
@@ -67,7 +67,7 @@ const Home = ({navigation, route, props}) => {
   const obtenerMasDisponilbes = async (latitud, longitud) => {
     paramsDefault.append('latitud', latitud); //-34.634491);
     paramsDefault.append('longitud', longitud); //-58.4648853);
-    paramsDefault.append('estado', estado);
+    paramsDefault.append('state', state);
 
     console.log();
     var request = {
@@ -75,11 +75,11 @@ const Home = ({navigation, route, props}) => {
     };
     console.log('request');
     console.log(request.params);
-    const url = constantes.BASE_URL + 'mascotasPorFiltro';
+    const url = constantes.BASE_URL + 'petsPorFiltro';
     try {
       //const resultado = await axios.get(url, request);
       console.log(resultado.data);
-      console.log('paso por obetener mascotas Home');
+      console.log('paso por obetener pets Home');
       //BUSCAR MASCOTAS
       setIndex(0);
       //gDisponibles([]);
@@ -124,23 +124,23 @@ const Home = ({navigation, route, props}) => {
       <HeaderDisponible
         heandlePress={heandlePress}
         goToFiltros={goToFiltros}
-        estado={estado}
+        state={state}
         styles={styles}
         setEstado={setEstado}
       />
-      {mascotasDisp.length === 0 && (
+      {petsDisp.length === 0 && (
         <View>
           <Text style={globalStyles.msjAdvertencia}>
-            No hay mascotas disponibles para los filtros aplicados
+            No hay pets disponibles para los filtros aplicados
           </Text>
         </View>
       )}
       <View style={{flex: 1}}>
-        {mascotasDisp.length > 0 && (
+        {petsDisp.length > 0 && (
           <SwiperCard
             {...props}
             navigation={navigation}
-            mascotasDisp={mascotasDisp}
+            petsDisp={petsDisp}
             onSwiped={onSwiped}
           />
         )}

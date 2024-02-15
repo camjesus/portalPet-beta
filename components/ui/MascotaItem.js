@@ -21,147 +21,147 @@ import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 import constantes from '../context/Constantes';
 import globalStyles from '../../styles/global';
 
-const MascotaItem = ({mascota, consultarMascotas, navigation, route}) => {
-  console.log('mascota');
-  console.log(mascota);
+const MascotaItem = ({pet, consultarMascotas, navigation, route}) => {
+  console.log('pet');
+  console.log(pet);
   const params = new URLSearchParams();
-  const [image, gFotoURL] = useState('../../img/default.jpg');
-  const {foto_url, nombre, estado, sexo, edad, fechaInicioS} = mascota;
-  const [nombreSexo, gNombreSexo] = useState('gender-male');
+  const [image] = useState('../../img/default.jpg');
+  const {image_url, name, state, sex, old, fechaInicioS} = pet;
+  const [nameSexo, setNameSex] = useState('gender-male');
   const [postText, setPostText] = React.useState('');
-  const [encontrado, setencontrado] = React.useState(false);
-  const [alerta, ingresarAlerta] = useState(false);
-  const [editar, setEditarM] = useState(true);
-  const [color, setcolor] = useState('');
-  const [mensaje, setMensaje] = useState(
+  const [found, setFound] = React.useState(false);
+  const [alert, setAlert] = useState(false);
+  const [edit, setEditPet] = useState(true);
+  const [color, setColor] = useState('');
+  const [message, setMensaje] = useState(
     'Desea eliminar esta mascota permanentemente?',
   );
   const [labelBoton, setLabelBoton] = useState('Eliminar');
 
   useEffect(() => {
-    console.log('entro a useEffec con la mascota ' + mascota);
+    console.log('entro a useEffec con la pet ' + pet);
     console.log(image);
-  }, [foto_url]);
+  }, [image_url]);
 
   useEffect(() => {
     tomoNombreIcon();
-    sexoMascota();
-    validoEncontrado();
-  }, [mascota]);
+    sexPet();
+    validFound();
+  }, [pet]);
 
   const tomoNombreIcon = () => {
     editMascota();
-    switch (estado) {
-      case 'ADOPCION':
-      case 'ADOPTADA':
-      case 'SEGUIMIENTO':
-        setcolor('amarillo');
-        if (estado === 'ADOPCION') {
+    switch (state) {
+      case 'inAdoption':
+      case 'adopted':
+      case 'follow':
+        setColor('yellow');
+        if (state === 'inAdoption') {
           setPostText('Adopción');
         } else {
-          setPostText(estado);
+          setPostText(state);
         }
         break;
-      case 'BUSCADO':
-      case 'ENCASA':
-        setcolor('celeste');
-        if (estado === 'ENCASA') {
+      case 'wanted':
+      case 'atHome':
+        setColor('sky-blue');
+        if (state === 'atHome') {
           setPostText('EN CASA');
         } else {
-          setPostText(estado);
+          setPostText(state);
         }
         break;
-      case 'ENCONTRADO':
-      case 'ENTREGADO':
-        setPostText(estado);
-        setcolor('verde');
+      case 'found':
+      case 'delivered':
+        setPostText(state);
+        setColor('green');
         break;
     }
   };
 
   const editMascota = () => {
-    setEditarM(true);
-    switch (estado) {
-      case 'ENTREGADO':
-      case 'ENCASA':
-      case 'ADOPTADA':
-      case 'SEGUIMIENTO':
-        setEditarM(false);
+    setEditPet(true);
+    switch (state) {
+      case 'delivered':
+      case 'atHome':
+      case 'adopted':
+      case 'follow':
+        setEditPet(false);
         break;
     }
   };
 
-  const sexoMascota = () => {
-    if (sexo.toUpperCase() === 'MACHO') {
-      gNombreSexo('gender-male');
+  const sexPet = () => {
+    if (sex.toUpperCase() === 'male') {
+      setNameSex('gender-male');
     } else {
-      gNombreSexo('gender-female');
+      setNameSex('gender-female');
     }
   };
 
-  const validoEncontrado = () => {
-    if (mascota.estado === 'ENCONTRADO' || mascota.estado === 'ENTREGADO') {
-      setencontrado(true);
+  const validFound = () => {
+    if (pet.state === 'found' || pet.state === 'delivered') {
+      setFound(true);
     }
   };
 
-  const mascotaEstado = () => {
-    console.log('Entro por mascota estado');
-    if (mascota.estado === 'ENCONTRADO' || mascota.estado === 'ENTREGADO') {
+  const petState = () => {
+    console.log('Entro por pet state');
+    if (pet.state === 'found' || pet.state === 'delivered') {
       navigation.navigate('StatusPet', {
-        mascotaItem: mascota,
-        type: mascota.estado,
+        pet: pet,
+        type: pet.state,
       });
     }
     if (
-      mascota.estado === 'ADOPCION' ||
-      mascota.estado === 'SEGUIMIENTO' ||
-      mascota.estado === 'ADOPTADA'
+      pet.state === 'inAdoption' ||
+      pet.state === 'follow' ||
+      pet.state === 'adopted'
     ) {
-      navigation.navigate('EstadosAdopcion', {mascotaItem: mascota});
+      navigation.navigate('EstadosAdopcion', {pet: pet});
     }
-    if (mascota.estado == 'BUSCADO' || mascota.estado == 'ENCASA') {
+    if (pet.state == 'wanted' || pet.state == 'atHome') {
       navigation.navigate('StatusPet', {
-        mascotaItem: mascota,
-        type: mascota.estado,
+        pet: pet,
+        type: pet.state,
       });
     }
   };
 
   const eliminarMascota = async () => {
     try {
-      const url = constantes.BASE_URL + `eliminarMascota/${mascota.id}`;
+      const url = constantes.BASE_URL + `eliminarMascota/${pet.id}`;
       console.log(url);
       const resultado = await axios.post(url);
       console.log(resultado.data);
-      console.log('Se elimino la mascota con éxito');
+      console.log('Se elimino la pet con éxito');
       setMensaje('Se eliminó la mascota con éxito');
       setLabelBoton('OK');
-      ingresarAlerta(true);
+      setAlert(true);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <TouchableOpacity onPress={mascotaEstado}>
+    <TouchableOpacity onPress={petState}>
       <View>
         <View style={style.viewContainer}>
           <View style={style.viewMascota}>
             <Image
               style={style.imgMascota}
               source={{
-                uri: foto_url,
+                uri: image_url,
               }}
             />
-            {editar == true && (
+            {edit == true && (
               <View style={style.container}>
                 <IconButton
                   icon="pencil"
                   color="#FFFFFF"
                   style={style.fab}
                   onPress={() => {
-                    navigation.navigate('NewPet', {mascotaItem: mascota});
+                    navigation.navigate('NewPet', {pet: pet});
                   }}
                   size={30}
                 />
@@ -174,60 +174,60 @@ const MascotaItem = ({mascota, consultarMascotas, navigation, route}) => {
               onPress={() => {
                 setLabelBoton('Eliminar');
                 setMensaje('Desea eliminar esta mascota permanentemente?');
-                ingresarAlerta(true);
+                setAlert(true);
               }}
               size={30}
             />
           </View>
 
           <View style={style.infoMascota}>
-            {encontrado && (
+            {found && (
               <View style={style.containerH1}>
-                <Text style={style.nombre}>{fechaInicioS}</Text>
+                <Text style={style.name}>{fechaInicioS}</Text>
                 <Maticons
                   style={style.iconSexo}
-                  name={nombreSexo}
+                  name={nameSexo}
                   size={30}
                   color="#9575cd"
                 />
               </View>
             )}
-            {!encontrado && (
+            {!found && (
               <View style={style.containerH1}>
-                <Text style={style.nombre}>{nombre}</Text>
-                <Text style={style.edad}>, {edad} años</Text>
+                <Text style={style.name}>{name}</Text>
+                <Text style={style.old}>, {old} años</Text>
                 <Maticons
                   style={style.iconSexo}
-                  name={nombreSexo}
+                  name={nameSexo}
                   size={30}
                   color="#9575cd"
                 />
               </View>
             )}
           </View>
-          {color === 'verde' && (
+          {color === 'green' && (
             <Text style={style.textEstadoEn}>{postText}</Text>
           )}
-          {color === 'amarillo' && (
+          {color === 'yellow' && (
             <Text style={style.textEstado}>{postText}</Text>
           )}
-          {color === 'celeste' && (
+          {color === 'sky-blue' && (
             <Text style={style.textEstadoBus}>{postText}</Text>
           )}
         </View>
       </View>
       <Portal>
-        <Dialog visible={alerta} style={globalStyles.dialog}>
-          <Dialog.Title style={globalStyles.dialogTitle}>Mensaje</Dialog.Title>
+        <Dialog visible={alert} style={globalStyles.dialog}>
+          <Dialog.Title style={globalStyles.dialosetTitle}>Mensaje</Dialog.Title>
           <Dialog.Content style={globalStyles.dialogMsj}>
-            <Paragraph>{mensaje}</Paragraph>
+            <Paragraph>{message}</Paragraph>
           </Dialog.Content>
           <Dialog.Actions style={{justifyContent: 'space-between'}}>
-            {mensaje == 'Desea eliminar esta mascota permanentemente?' && (
+            {message == 'Desea eliminar esta mascota permanentemente?' && (
               <Button
                 style={{marginHorizontal: 10}}
                 onPress={() => {
-                  ingresarAlerta(false);
+                  setAlert(false);
                 }}>
                 Cancelar
               </Button>
@@ -235,7 +235,7 @@ const MascotaItem = ({mascota, consultarMascotas, navigation, route}) => {
             <Button
               style={{marginHorizontal: 10}}
               onPress={() => {
-                ingresarAlerta(false);
+                setAlert(false);
                 eliminarMascota();
                 consultarMascotas(true);
               }}>
@@ -340,11 +340,11 @@ const style = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
-  nombre: {
+  name: {
     fontSize: 30,
     marginTop: 'auto',
   },
-  descripcionText: {
+  aboutMeText: {
     fontSize: 10,
   },
   container: {
@@ -362,14 +362,14 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  descripcion: {
+  aboutMe: {
     fontSize: 18,
     color: '#D5D8DC',
   },
   decContainer: {
     flexWrap: 'nowrap',
   },
-  edad: {
+  old: {
     fontSize: 30,
     marginTop: 'auto',
   },

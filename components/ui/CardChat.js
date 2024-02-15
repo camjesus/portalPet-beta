@@ -13,25 +13,25 @@ const CardChat = ({item, user, route}) => {
   const {chat} = item;
   const navigation = useNavigation();
   const [image, gFotoURL] = useState('../../img/default.jpg');
-  const [nombreUsr1, setNombre1] = useState();
-  const [nombreUsr2, setNombre2] = useState();
-  const [nombreMascota, setNombreMas] = useState();
-  const mascotaItemRef = useRef(null);
+  const [nameUsr1, setNombre1] = useState();
+  const [nameUsr2, setNombre2] = useState();
+  const [nameMascota, setNombreMas] = useState();
+  const petRef = useRef(null);
 
   useEffect(() => {
     setNombreMas(
-      chat.nombreMascota.substring(0, 1).toUpperCase() +
-        chat.nombreMascota.substr(1, chat.nombreMascota.length - 1),
+      chat.nameMascota.substring(0, 1).toUpperCase() +
+        chat.nameMascota.substr(1, chat.nameMascota.length - 1),
     );
 
     setNombre1(
-      chat.nombreUsr1.substring(0, 1).toUpperCase() +
-        chat.nombreUsr1.substr(1, chat.nombreUsr1.length - 1),
+      chat.nameUsr1.substring(0, 1).toUpperCase() +
+        chat.nameUsr1.substr(1, chat.nameUsr1.length - 1),
     );
 
     setNombre2(
-      chat.nombreUsr2.substring(0, 1).toUpperCase() +
-        chat.nombreUsr2.substr(1, chat.nombreUsr2.length - 1),
+      chat.nameUsr2.substring(0, 1).toUpperCase() +
+        chat.nameUsr2.substr(1, chat.nameUsr2.length - 1),
     );
   }, []);
 
@@ -39,30 +39,30 @@ const CardChat = ({item, user, route}) => {
     try {
       console.log('chatRef.current.idMascota');
       console.log(id);
-      const url = constantes.BASE_URL + `mascota/${id}`;
+      const url = constantes.BASE_URL + `pet/${id}`;
       console.log(url);
       const resultado = await axios.get(url);
-      console.log('paso por obetener mascota data');
-      mascotaItemRef.current = resultado.data;
-      console.log(mascotaItemRef.current);
+      console.log('paso por obetener pet data');
+      petRef.current = resultado.data;
+      console.log(petRef.current);
       console.log(resultado.data);
 
-      if (mascotaItemRef.current != null) {
-        console.log('mascotaItemRef.current');
-        console.log(mascotaItemRef.current);
+      if (petRef.current != null) {
+        console.log('petRef.current');
+        console.log(petRef.current);
         if (redirect === 'chat') {
           navigation.navigate('ChatScreen', {
             navigation: navigation,
-            mascotaItem: mascotaItemRef.current,
+            pet: petRef.current,
             idChat: item._id,
             chat: {
               idChat: item._id,
               fecha: chat.fecha,
               idMascota: chat.idMascota,
               imagenMascota: chat.imagenMascota,
-              nombreMascota: chat.nombreMascota,
-              nombreUsr1: chat.nombreUsr1,
-              nombreUsr2: chat.nombreUsr2,
+              nameMascota: chat.nameMascota,
+              nameUsr1: chat.nameUsr1,
+              nameUsr2: chat.nameUsr2,
               usuario1: chat.usuario1,
               usuario2: chat.usuario2,
               solicitado: chat.solicitado,
@@ -71,7 +71,7 @@ const CardChat = ({item, user, route}) => {
           });
         } else {
           navigation.push('DetalleMascota', {
-            mascotaItem: mascotaItemRef.current,
+            pet: petRef.current,
             idMascota: item.chat?.idMascota,
           });
           //navigation.push('BuscarStack', {screen: 'DetalleMascota'});
@@ -104,24 +104,24 @@ const CardChat = ({item, user, route}) => {
         </View>
         <View>
           <View style={style.cuerpo}>
-            {chat.nombreMascota !== '' && (
+            {chat.nameMascota !== '' && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel}>Mascota</Text>
-                <Text style={style.text}> {nombreMascota}</Text>
+                <Text style={style.text}> {nameMascota}</Text>
               </View>
             )}
             <View style={style.viewRow}>
               <Text style={style.textlabel}>Transitado por</Text>
-              <Text style={style.text}>{nombreUsr1}</Text>
+              <Text style={style.text}>{nameUsr1}</Text>
             </View>
           </View>
         </View>
         <View>
           <View style={style.cuerpo}>
-            {chat.nombreMascota !== '' && (
+            {chat.nameMascota !== '' && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel}>Adoptante</Text>
-                <Text style={style.text}> {nombreUsr2}</Text>
+                <Text style={style.text}> {nameUsr2}</Text>
               </View>
             )}
 

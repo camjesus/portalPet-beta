@@ -25,8 +25,8 @@ const Login = (props) => {
   const [user, setUser] = useState(null);
   const [usuario, setEmail] = useState('');
   const [password, setPass] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [alerta, ingresarAlerta] = useState(false);
+  const [message, setMensaje] = useState('');
+  const [alert, setAlert] = useState(false);
   const userRef = useRef();
   const passRef = useRef();
   const isFirstTime = useRef(true);
@@ -83,14 +83,14 @@ const Login = (props) => {
       console.log(ex);
       console.log('ERROR');
       setMensaje('Error al buscar usuario en la base de datos');
-      ingresarAlerta(true);
+      setAlert(true);
     }
 }
 
   const logIn = async () => {
     if (usuario === '' || password === '') {
       setMensaje('Todos los campos son requeridos');
-      ingresarAlerta(true);
+      setAlert(true);
       return;
     }
     try {
@@ -101,7 +101,7 @@ const Login = (props) => {
     } catch (error) {
       console.log('ERROR');
       setMensaje('Usuario no existente');
-      ingresarAlerta(true);
+      setAlert(true);
       console.log('erro buscanbdo usuario' + error);
     }
   };
@@ -139,7 +139,7 @@ const Login = (props) => {
             <TextInput
               label="E-Mail"
               value={usuario}
-              onChangeText={(texto) => setEmail(texto)}
+              onChangeText={(text) => setEmail(text)}
               style={style.input}
               ref={userRef}
               autoCapitalize="none"
@@ -151,7 +151,7 @@ const Login = (props) => {
             <TextInput
               label="Contraseña"
               value={password}
-              onChangeText={(texto) => setPass(texto)}
+              onChangeText={(text) => setPass(text)}
               style={style.input}
               ref={passRef}
               left={<TextInput.Icon name="key" color="#9575cd" />}
@@ -180,13 +180,13 @@ const Login = (props) => {
         </View>
           <View>
             <Portal>
-              <Dialog visible={alerta} style={globalStyles.dialog}>
-                <Dialog.Title style={globalStyles.dialogTitle}>Error</Dialog.Title>
+              <Dialog visible={alert} style={globalStyles.dialog}>
+                <Dialog.Title style={globalStyles.dialosetTitle}>Error</Dialog.Title>
                 <Dialog.Content>
-                  <Paragraph style={globalStyles.dialogMsj}>{mensaje}</Paragraph>
+                  <Paragraph style={globalStyles.dialogMsj}>{message}</Paragraph>
                 </Dialog.Content>
                 <Dialog.Actions>
-                  <Button mode="contained" onPress={() => ingresarAlerta(false)}>
+                  <Button mode="contained" onPress={() => setAlert(false)}>
                     Ok
                   </Button>
                 </Dialog.Actions>

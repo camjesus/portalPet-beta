@@ -5,14 +5,15 @@ import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import ButtonCamera from '../components/ui/ButtonCamera';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function MyCamera({navigation, route}) {
   console.log('route');
   console.log(route);
   const {params} = route;
-  const {mascotaItem} = params;
-  console.log('mascotaItem');
-  console.log(mascotaItem);
+  const {pet} = params;
+  console.log('pet');
+  console.log(pet);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [image, setImage] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -39,20 +40,28 @@ export default function MyCamera({navigation, route}) {
     }
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const savePicture = async () => {
     if (image) {
       try {
         const asset = await MediaLibrary.createAssetAsync(image);
-        console.log('asset');
-        console.log(asset);
-        console.log('uriii');
-        console.log(asset.uri);
-        alert('Picture saved! 🎉');
-        console.log('saved successfully');
-        mascotaItem.foto_url = asset.uri;
-        mascotaItem.cambioFoto = false;
-        navigation.navigate('NewPet', {mascotaItem: mascotaItem});
-        //setImage(null);
+        pet.image_url = asset.uri;
+        pet.changePhoto = false;
+        setImage(null);
+        navigation.navigate('NewPet', {pet: pet});
       } catch (error) {
         console.log(error);
       }
@@ -77,16 +86,20 @@ export default function MyCamera({navigation, route}) {
               flexDirection: 'row',
               justifyContent: 'space-between',
               paddingHorizontal: 30,
+              marginTop: 10
             }}
           >
             <ButtonCamera
-              title=""
               icon="retweet"
               onPress={() => {
                 setType(
                   type === CameraType.back ? CameraType.front : CameraType.back
                 );
               }}
+            />
+             <ButtonCamera
+              icon="folder"
+              onPress={pickImage}
             />
             <ButtonCamera
               onPress={() =>
@@ -112,17 +125,18 @@ export default function MyCamera({navigation, route}) {
               flexDirection: 'row',
               justifyContent: 'space-between',
               paddingHorizontal: 50,
+              marginBottom: 20
             }}
           >
             <ButtonCamera
-              title="Re-take"
+              type="circle"
               onPress={() => setImage(null)}
               icon="retweet"
             />
-            <ButtonCamera title="Save" onPress={savePicture} icon="check" />
+            <ButtonCamera type="circle" onPress={savePicture} icon="check" />
           </View>
         ) : (
-          <ButtonCamera title="Take a picture" onPress={takePicture} icon="camera" />
+          <ButtonCamera type="circle" onPress={takePicture} icon="camera" /> //agregar un nuevo boton para que tenga otro estilo
         )}
       </View>
     </View>
@@ -135,7 +149,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#000',
-    padding: 8,
   },
   controls: {
     flex: 0.5,
@@ -154,8 +167,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   camera: {
-    flex: 5,
-    borderRadius: 20,
+    flex: 6
   },
   topControls: {
     flex: 1,

@@ -6,23 +6,23 @@ import {StyleSheet, View, Image, Text, TouchableOpacity} from 'react-native';
 import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-paper';
 
-const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
+const SwiperCard = ({navigation, petsDisp, onSwiped}) => {
   useEffect(() => {
-  }, [mascotasDisp]);
+  }, [petsDisp]);
 
-  const Card = ({mascota}) => (
+  const Card = ({pet}) => (
     <TouchableOpacity
       style={style.cardNew}
       onPress={() => {
         navigation.navigate('DetalleMascota', {
-          mascotaItem: mascota,
-          idMascota: mascota.id,
+          pet: pet,
+          idMascota: pet.id,
         });
       }}>
       <Image
         style={style.imgMascota}
         source={{
-          uri: mascota?.foto_url,
+          uri: pet?.image_url,
         }}
       />
       <View style={style.pawRow}>
@@ -30,19 +30,19 @@ const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
           style={style.paw}
           name="paw"
           size={45}
-          color={mascota?.tamanio === 'GRANDE' ? '#9575cd' : '#FFFFFF'}
+          color={pet?.size === 'big' ? '#9575cd' : '#FFFFFF'}
         />
         <Maticons
           style={style.paw}
           name="paw"
           size={35}
-          color={mascota?.tamanio === 'MEDIANO' ? '#9575cd' : '#FFFFFF'}
+          color={pet?.size === 'Medium' ? '#9575cd' : '#FFFFFF'}
         />
         <Maticons
           style={style.paw}
           name="paw"
           size={25}
-          color={mascota?.tamanio === 'CHICO' ? '#9575cd' : '#FFFFFF'}
+          color={pet?.size === 'small' ? '#9575cd' : '#FFFFFF'}
         />
       </View>
       <Button
@@ -50,8 +50,8 @@ const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
         mode="contained"
         onPress={() => {
           navigation.navigate('DetalleMascota', {
-            mascotaItem: mascota,
-            idMascota: mascota.id,
+            pet: pet,
+            idMascota: pet.id,
           });
         }}
         animated="true"
@@ -59,13 +59,13 @@ const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
         Ver ficha
       </Button>
       <View style={style.infoMascota}>
-        {mascota?.estado === 'ENCONTRADO' && (
+        {pet?.state === 'found' && (
           <View style={style.containerH1}>
-            <Text style={style.nombre}>{mascota?.fechaInicioS}</Text>
+            <Text style={style.name}>{pet?.fechaInicioS}</Text>
             <Maticons
               style={style.iconSexo}
               name={
-                mascota?.sexo.toUpperCase() === 'MACHO'
+                pet?.sex.toUpperCase() === 'male'
                   ? 'gender-male'
                   : 'gender-female'
               }
@@ -74,14 +74,14 @@ const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
             />
           </View>
         )}
-        {mascota?.estado !== 'ENCONTRADO' && (
+        {pet?.state !== 'found' && (
           <View style={style.containerH1}>
-            <Text style={style.nombre}>{mascota?.nombre}</Text>
-            <Text style={style.edad}>, {mascota?.edad} años</Text>
+            <Text style={style.name}>{pet?.name}</Text>
+            <Text style={style.old}>, {pet?.old} años</Text>
             <Maticons
               style={style.iconSexo}
               name={
-                mascota?.sexo.toUpperCase() === 'MACHO'
+                pet?.sex.toUpperCase() === 'male'
                   ? 'gender-male'
                   : 'gender-female'
               }
@@ -96,9 +96,9 @@ const SwiperCard = ({navigation, mascotasDisp, onSwiped}) => {
 
   return (
     <Swiper
-      cards={mascotasDisp}
+      cards={petsDisp}
       cardIndex={0}
-      renderCard={(card) => <Card mascota={card} />}
+      renderCard={(card) => <Card pet={card} />}
       onSwiped={onSwiped}
       backgroundColor="#FFFFFF"
       disableTopSwipe
@@ -147,12 +147,12 @@ const style = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderRadius: 10,
   },
-  nombre: {
+  name: {
     fontSize: 30,
     marginTop: 'auto',
     marginVertical: 10,
   },
-  edad: {
+  old: {
     fontSize: 30,
     marginTop: 'auto',
     marginVertical: 10,

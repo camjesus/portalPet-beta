@@ -34,21 +34,27 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Dejas que $(PRODUCT_NAME) acceda a tu ubicación?."
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "photosPermission": "Dejas que $(PRODUCT_NAME) tenga acceso a tus fotos?.",
+          "savePhotosPermission": "Dejas que $(PRODUCT_NAME) guarde esta foto?.",
           "isAccessMediaLocationEnabled": true
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+          "cameraPermission": "Dejas que $(PRODUCT_NAME) tenga acceso a tu cámara?."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Dejas que $(PRODUCT_NAME) tenga acceso a tus fotos?."
         }
       ]
     ]

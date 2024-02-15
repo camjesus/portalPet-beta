@@ -3,29 +3,29 @@ import {View, StyleSheet, Image} from 'react-native';
 import {Text} from 'react-native-paper';
 import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-function CardDetalle({mascotaItem, nombreSexo}) {
+function CardDetalle({pet, nameSexo}) {
   return (
     <View>
       <View>
         <Image
           style={style.imgMascota}
           source={{
-            uri: mascotaItem.foto_url,
+            uri: pet.image_url,
           }}
         />
       </View>
       <View style={style.viewDetalle}>
         <View style={style.infoMascota}>
           <View style={style.containerH1}>
-            {mascotaItem.nombre !== '' && (
-              <Text style={style.nombre}>{mascotaItem.nombre}</Text>
+            {pet.name !== '' && (
+              <Text style={style.name}>{pet.name}</Text>
             )}
-            {mascotaItem.nombre === '' && (
-              <Text style={style.nombre}>{mascotaItem.fechaInicioS}</Text>
+            {pet.name === '' && (
+              <Text style={style.name}>{pet.fechaInicioS}</Text>
             )}
             <Maticons
               style={style.iconSexo}
-              name={nombreSexo}
+              name={nameSexo}
               size={30}
               color="#F59822"
             />
@@ -37,12 +37,12 @@ function CardDetalle({mascotaItem, nombreSexo}) {
 }
 
 const style = StyleSheet.create({
-  descripcion: {
+  aboutMe: {
     fontSize: 15,
     marginTop: 0,
     marginHorizontal: 10,
   },
-  tituloDes: {
+  titleDes: {
     fontSize: 18,
     marginStart: 5,
     fontWeight: 'bold',
@@ -51,7 +51,7 @@ const style = StyleSheet.create({
     marginRight: 'auto',
     marginStart: 5,
   },
-  nombre: {
+  name: {
     fontSize: 25,
     marginBottom: 'auto',
   },

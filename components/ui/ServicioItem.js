@@ -6,7 +6,7 @@ import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
 const ServicioItem = ({servicio}) => {
   console.log('servicio');
   console.log(servicio);
-  const {costo, titulo, descripcion, urlPago,email,nombre,apellido} = servicio;
+  const {costo, title, aboutMe, urlPago,email,name,apellido} = servicio;
   const supportedURL = 'https://mpago.la/2fCvVnm';
 
   const OpenURLButton = ({url, children}) => {
@@ -33,20 +33,20 @@ const ServicioItem = ({servicio}) => {
 
   const contratarServicio = () => {};
   return (
-    <Card style={style.titulo}>
+    <Card style={style.title}>
       <View style={style.viewContainer}>
         <View style={style.viewHeader}>
-          <Text style={style.titHeader}>{titulo}</Text>
+          <Text style={style.titHeader}>{title}</Text>
         </View>
 
         <View style={style.viewRow}>
-  <Text style={style.descripcionText}>{descripcion}</Text>
+  <Text style={style.aboutMeText}>{aboutMe}</Text>
         </View>
         <View style={style.viewRow}>
-         <Text style={style.descripcionText}>{nombre} {apellido}</Text>
+         <Text style={style.aboutMeText}>{name} {apellido}</Text>
          </View>
          <View style={style.viewRow}>
-         <Text style={style.descripcionText}>{email} </Text>
+         <Text style={style.aboutMeText}>{email} </Text>
          </View>
        
         <View style={style.viewRowPrecio}>
@@ -60,7 +60,7 @@ const ServicioItem = ({servicio}) => {
 };
 
 const style = StyleSheet.create({
-  titulo: {
+  title: {
     margin: 10,
     justifyContent: 'center',
     flexDirection: 'row',
@@ -86,12 +86,12 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  descripcionText: {
+  aboutMeText: {
     margin: 10,
     fontSize: 15,
     color: '#252932',
   },
-  nombreText: {
+  nameText: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#252932',
