@@ -14,7 +14,7 @@ const SwiperCard = ({navigation, petsDisp, onSwiped}) => {
     <TouchableOpacity
       style={style.cardNew}
       onPress={() => {
-        navigation.navigate('DetalleMascota', {
+        navigation.navigate('DetailsPet', {
           pet: pet,
           idMascota: pet.id,
         });
@@ -36,7 +36,7 @@ const SwiperCard = ({navigation, petsDisp, onSwiped}) => {
           style={style.paw}
           name="paw"
           size={35}
-          color={pet?.size === 'Medium' ? '#9575cd' : '#FFFFFF'}
+          color={pet?.size === 'medium' ? '#9575cd' : '#FFFFFF'}
         />
         <Maticons
           style={style.paw}
@@ -49,7 +49,7 @@ const SwiperCard = ({navigation, petsDisp, onSwiped}) => {
         style={style.masInfo}
         mode="contained"
         onPress={() => {
-          navigation.navigate('DetalleMascota', {
+          navigation.navigate('DetailsPet', {
             pet: pet,
             idMascota: pet.id,
           });

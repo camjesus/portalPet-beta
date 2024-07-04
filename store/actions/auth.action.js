@@ -21,32 +21,28 @@ export const signup = (userId) => {
 export const AddnewUser = (newUser) => {
   return async (dispatch) => {
   const auth = FIREBASE_AUTH;
-  try {
-    const response = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
-    console.log(response);
-    //GUARDO EN MI BASE DE DATOS USERS
-    const newDoc = addDoc(collection(FIREBASE_DB, 'users'), {
-      uid: response.user.uid,
-      name: name,
-      lastname: apellido,
-      email: email,
-      ubication: null,
-      phone: telefono
-    });
-    console.log(newDoc);
-    console.log('response');
-    console.log(response);
-    setResultadoCrear(true);
-  }
-  catch(error){
-      console.log("eeror al crear usuario" + error.code + error.message);
-      console.log(error);
-      setResultadoCrear(false);
-    }
+  createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        addDoc(collection(FIREBASE_DB, "users"), {
+          uid: user.uid,
+          name: name,
+          lastname: apellido,
+          email: email,
+          ubication: null,
+          phone: telefono,
+        });
+      })
+      .catch((error) => {
+        console.log("eeror al crear usuario" + error.code + error.message);
+        setResultadoCrear(false);
+      });
 
     dispatch({
       type: NEW_USER,
-      userId: response.user.uid,
+      userId: user.uid,
     });
   };
 };

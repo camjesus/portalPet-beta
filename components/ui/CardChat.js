@@ -13,41 +13,41 @@ const CardChat = ({item, user, route}) => {
   const {chat} = item;
   const navigation = useNavigation();
   const [image, gFotoURL] = useState('../../img/default.jpg');
-  const [nameUsr1, setNombre1] = useState();
-  const [nameUsr2, setNombre2] = useState();
-  const [nameMascota, setNombreMas] = useState();
+  const [nameUsr1, setNombre1] = useState(chat.nameUser1);
+  const [nameUsr2, setNombre2] = useState(chat.nameUser2);
+  const [namePet, setNombreMas] = useState(chat.namePet);
   const petRef = useRef(null);
 
   useEffect(() => {
     setNombreMas(
-      chat.nameMascota.substring(0, 1).toUpperCase() +
-        chat.nameMascota.substr(1, chat.nameMascota.length - 1),
+      chat.namePet.substring(0, 1).toUpperCase() +
+        chat.namePet.substr(1, chat.namePet.length - 1),
     );
 
     setNombre1(
-      chat.nameUsr1.substring(0, 1).toUpperCase() +
-        chat.nameUsr1.substr(1, chat.nameUsr1.length - 1),
+      chat.nameUser1.substring(0, 1).toUpperCase() +
+        chat.nameUser1.substr(1, chat.nameUser1.length - 1),
     );
 
     setNombre2(
-      chat.nameUsr2.substring(0, 1).toUpperCase() +
-        chat.nameUsr2.substr(1, chat.nameUsr2.length - 1),
+      chat.nameUser2.substring(0, 1).toUpperCase() +
+        chat.nameUser2.substr(1, chat.nameUser2.length - 1),
     );
   }, []);
 
-  const buscarMascota = async (id, redirect) => {
-    try {
-      console.log('chatRef.current.idMascota');
-      console.log(id);
-      const url = constantes.BASE_URL + `pet/${id}`;
-      console.log(url);
-      const resultado = await axios.get(url);
-      console.log('paso por obetener pet data');
-      petRef.current = resultado.data;
-      console.log(petRef.current);
-      console.log(resultado.data);
+  const searchPet = async (id, redirect) => {
+    //try {
+      //console.log('chatRef.current.idMascota');
+      //console.log(id);
+      //const url = constantes.BASE_URL + `pet/${id}`;
+      //console.log(url);
+      //const resultado = await axios.get(url);
+      //console.log('paso por obetener pet data');
+      //petRef.current = resultado.data;
+      //console.log(petRef.current);
+      //console.log(resultado.data);
 
-      if (petRef.current != null) {
+      //if (petRef.current != null) {
         console.log('petRef.current');
         console.log(petRef.current);
         if (redirect === 'chat') {
@@ -57,57 +57,57 @@ const CardChat = ({item, user, route}) => {
             idChat: item._id,
             chat: {
               idChat: item._id,
-              fecha: chat.fecha,
-              idMascota: chat.idMascota,
-              imagenMascota: chat.imagenMascota,
-              nameMascota: chat.nameMascota,
-              nameUsr1: chat.nameUsr1,
-              nameUsr2: chat.nameUsr2,
-              usuario1: chat.usuario1,
-              usuario2: chat.usuario2,
-              solicitado: chat.solicitado,
+              date: chat.date,
+              idPet: chat.idPet,
+              imagePet: chat.imagePet,
+              namePet: chat.namePet,
+              nameUser1: chat.nameUser1,
+              nameUser2: chat.nameUser2,
+              rescuerId: chat.rescuerId,
+              userId: chat.userId,
+              required: chat.required,
             },
-            user: {_id: user._id, name: user.name},
+            user: user,
           });
         } else {
           navigation.push('DetalleMascota', {
             pet: petRef.current,
-            idMascota: item.chat?.idMascota,
+            idMascota: item.chat?.idPet,
           });
           //navigation.push('BuscarStack', {screen: 'DetalleMascota'});
 
         }
-      }
-    } catch (error) {
-      console.log(error);
-    }
+      //}
+    //} catch (error) {
+    //  console.log(error);
+    //}
   };
 
   return (
     <TouchableOpacity
       onPress={() => {
-        buscarMascota(chat.idMascota, 'chat');
+        searchPet(chat.idPet, 'chat');
       }}>
       <View style={style.cardNew}>
         <View>
           <TouchableOpacity
             onPress={() => {
-              buscarMascota(chat.idMascota, 'detalle');
+              searchPet(chat.idPet, 'detalle');
             }}>
             <Image
               style={style.avatarImage}
               source={{
-                uri: item.chat?.imagenMascota,
+                uri: item.chat?.imagePet,
               }}
             />
           </TouchableOpacity>
         </View>
         <View>
           <View style={style.cuerpo}>
-            {chat.nameMascota !== '' && (
+            {chat.namePet !== '' && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel}>Mascota</Text>
-                <Text style={style.text}> {nameMascota}</Text>
+                <Text style={style.text}> {namePet}</Text>
               </View>
             )}
             <View style={style.viewRow}>
@@ -118,21 +118,21 @@ const CardChat = ({item, user, route}) => {
         </View>
         <View>
           <View style={style.cuerpo}>
-            {chat.nameMascota !== '' && (
+            {chat.namePet !== '' && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel}>Adoptante</Text>
                 <Text style={style.text}> {nameUsr2}</Text>
               </View>
             )}
 
-            {chat.solicitado === true && chat.usuario1 === user._id && (
+            {chat.required === true && chat.rescuerId === user._id && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel} />
                 <Text style={style.textSolc}>Solicitado</Text>
               </View>
             )}
 
-            {chat.solicitado === true && chat.usuario1 !== user._id && (
+            {chat.required === true && chat.rescuerId !== user._id && (
               <View style={style.viewRow}>
                 <Text style={style.textlabel} />
                 <Text style={style.textSolc}>Solicitaste</Text>

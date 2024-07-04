@@ -22,9 +22,8 @@ import constantes from '../context/Constantes';
 import globalStyles from '../../styles/global';
 
 const MascotaItem = ({pet, consultarMascotas, navigation, route}) => {
-  console.log('pet');
-  console.log(pet);
-  const params = new URLSearchParams();
+  //console.log('pssssset');
+  //console.log(pet);
   const [image] = useState('../../img/default.jpg');
   const {image_url, name, state, sex, old, fechaInicioS} = pet;
   const [nameSexo, setNameSex] = useState('gender-male');
@@ -73,7 +72,7 @@ const MascotaItem = ({pet, consultarMascotas, navigation, route}) => {
         break;
       case 'found':
       case 'delivered':
-        setPostText(state);
+        setPostText('Buscado');
         setColor('green');
         break;
     }
@@ -216,34 +215,7 @@ const MascotaItem = ({pet, consultarMascotas, navigation, route}) => {
           )}
         </View>
       </View>
-      <Portal>
-        <Dialog visible={alert} style={globalStyles.dialog}>
-          <Dialog.Title style={globalStyles.dialosetTitle}>Mensaje</Dialog.Title>
-          <Dialog.Content style={globalStyles.dialogMsj}>
-            <Paragraph>{message}</Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions style={{justifyContent: 'space-between'}}>
-            {message == 'Desea eliminar esta mascota permanentemente?' && (
-              <Button
-                style={{marginHorizontal: 10}}
-                onPress={() => {
-                  setAlert(false);
-                }}>
-                Cancelar
-              </Button>
-            )}
-            <Button
-              style={{marginHorizontal: 10}}
-              onPress={() => {
-                setAlert(false);
-                eliminarMascota();
-                consultarMascotas(true);
-              }}>
-              {labelBoton}
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      
     </TouchableOpacity>
   );
 };

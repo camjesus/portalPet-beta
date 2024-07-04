@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, View,Alert} from 'react-native';
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, View, Alert } from "react-native";
 import {
   Button,
   Checkbox,
@@ -7,140 +7,79 @@ import {
   Card,
   Switch,
   IconButton,
-} from 'react-native-paper';
-import Slider from 'react-native-slider';
-import globalStyles from '../styles/global';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "react-native-paper";
+import Slider from "react-native-slider";
+import globalStyles from "../styles/global";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Filters = ({navigation, route}) => {
-  console.log('filtros route');
-  console.log(route);
-
-  const [old, gOld] = useState(30);
-  const [distancia, gDistancia] = useState(100);
-  const [checkedMacho, setCheckedMacho] = React.useState(true);
-  const [checkedHembra, setCheckedHembra] = React.useState(true);
-  const [checkedPeque, setCheckedPeque] = React.useState(true);
-  const [checkedMediano, setCheckedMediano] = React.useState(true);
-  const [checkedGrande, setCheckedGrande] = React.useState(true);
-  const [checkedPerro, setCheckedPerro] = React.useState(true);
-  const [checkedGato, setCheckedGato] = React.useState(true);
-  const km = ' km';
-  const anios = ' años';
-  const params = new URLSearchParams();
-  const filtrosAnteriores = route.params.filtros._searchParams;
+const Filters = ({ navigation, route }) => {
+  console.log("filtros route");
+  console.log(route.params);
+  const { filters } = route.params;
+  const [old, gOld] = useState(filters.old);
+  const [distancia, gDistancia] = useState(filters.distance);
+  const [checkedMacho, setCheckedMacho] = React.useState(
+    filters.sex.some((s) => s === "male") ?? true
+  );
+  const [checkedHembra, setCheckedHembra] = React.useState(
+    filters.sex.some((s) => s === "famale") ?? true
+  );
+  const [checkedPeque, setCheckedPeque] = React.useState(
+    filters.size.some((s) => s === "small") ?? true
+  );
+  const [checkedMediano, setCheckedMediano] = React.useState(
+    filters.size.some((s) => s === "medium") ?? true
+  );
+  const [checkedGrande, setCheckedGrande] = React.useState(
+    filters.size.some((s) => s === "big") ?? true
+  );
+  const [checkedPerro, setCheckedPerro] = React.useState(
+    filters.petType.some((s) => s === "dog") ?? true
+  );
+  const [checkedGato, setCheckedGato] = React.useState(
+    filters.petType.some((s) => s === "cat") ?? true
+  );
+  const km = " km";
+  const anios = " años";
 
   const aplicarFiltros = (latitud, longitud) => {
-    params.append('state', filtrosAnteriores[0][1]);
+    filters.size = [];
+    filters.petType = [];
+    filters.sex = [];
 
     if (checkedPeque) {
-      params.append('size', 'small');
+      filters.size.push("small");
     }
     if (checkedMediano) {
-      params.append('size', 'Medium');
+      filters.size.push("medium");
     }
     if (checkedGrande) {
-      params.append('size', 'big');
+      filters.size.push("big");
     }
 
     if (checkedPerro) {
-      params.append('type', 'dog');
+      filters.petType.push("dog");
     }
     if (checkedGato) {
-      params.append('type', 'cat');
+      filters.petType.push("cat");
     }
 
     if (checkedMacho) {
-      params.append('sex', 'male');
+      filters.sex.push("male");
     }
     if (checkedHembra) {
-      params.append('sex', 'famale');
+      filters.sex.push("famale");
     }
-    params.append('old', old);
+    filters.old = old;
 
-    params.append("latitud",latitud);
-    params.append("longitud",longitud);
-    params.append("distancia",distancia);
+    //params.append("latitud", latitud);
+    //params.append("longitud", longitud);filters.
+    filters.distance = distancia;
 
-    console.log('filtrosAnteriores');
-    console.log(filtrosAnteriores);
-
-    console.log(params);
-    guardarFiltros();
-    navigation.navigate('Home', {data: params});
+    console.log("filtrosAnteriores");
+    console.log(filters);
+    navigation.navigate("Home", { data: filters });
   };
-
-  const guardarFiltros = async () => {
-    try {
-      await AsyncStorage.setItem('checkedMacho', JSON.stringify(checkedMacho));
-      await AsyncStorage.setItem('checkedHembra', JSON.stringify(checkedHembra));
-      await AsyncStorage.setItem('checkedPeque', JSON.stringify(checkedPeque));
-      await AsyncStorage.setItem('checkedGrande', JSON.stringify(checkedGrande));
-      await AsyncStorage.setItem('checkedPerro', JSON.stringify(checkedPerro));
-      await AsyncStorage.setItem('checkedGato', JSON.stringify(checkedGato));
-      await AsyncStorage.setItem('distancia', JSON.stringify(distancia));
-      await AsyncStorage.setItem('old', JSON.stringify(old));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const validoStorage = async () => {
-    try {
-      await AsyncStorage.getItem('checkedMacho').then((value) => {
-        if (value != null) {
-          setValores();
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const setValores = async () => {
-    try {
-      await AsyncStorage.getItem('checkedMacho').then((value) => {
-        setCheckedMacho(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('checkedHembra').then((value) => {
-        setCheckedHembra(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('checkedPeque').then((value) => {
-        setCheckedPeque(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('checkedGrande').then((value) => {
-        setCheckedGrande(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('checkedPerro').then((value) => {
-        setCheckedPerro(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('checkedGato').then((value) => {
-        setCheckedGato(value == 'true' ? true : false);
-      });
-
-      await AsyncStorage.getItem('distancia').then((value) => {
-        gDistancia(parseInt(value));
-      });
-
-      await AsyncStorage.getItem('old').then((value) => {
-        gOld(parseInt(value));
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    validoStorage();
-    //aplicarFiltros(location.latitude, location.longitude);
-    console.log('location filters');
-    console.log(filtrosAnteriores);
-  }, [filtrosAnteriores]);
 
   return (
     <View style={globalStyles.base}>
@@ -162,15 +101,15 @@ const Filters = ({navigation, route}) => {
         </View>
         <View style={style.contenedorRowTS}>
           <View style={style.petRowTS}>
-          <View style={style.petCol}>
-            <Text style={style.textCheck}>Perro</Text>
-            <Switch
-              value={checkedPerro}
-              color="#9575cd"
-              onValueChange={() => {
-                setCheckedPerro(!checkedPerro);
-              }}
-            />
+            <View style={style.petCol}>
+              <Text style={style.textCheck}>Perro</Text>
+              <Switch
+                value={checkedPerro}
+                color="#9575cd"
+                onValueChange={() => {
+                  setCheckedPerro(!checkedPerro);
+                }}
+              />
             </View>
             <View style={style.petCol}>
               <Text style={style.textCheck}>Gato</Text>
@@ -184,62 +123,62 @@ const Filters = ({navigation, route}) => {
             </View>
           </View>
           <View style={style.petRowTS}>
-          <View style={style.petCol}>
-            <Text style={style.textCheck}>Macho</Text>
-            <Switch
-              value={checkedMacho}
-              color="#9575cd"
-              onValueChange={() => {
-                setCheckedMacho(!checkedMacho);
-              }}
-            />
+            <View style={style.petCol}>
+              <Text style={style.textCheck}>Macho</Text>
+              <Switch
+                value={checkedMacho}
+                color="#9575cd"
+                onValueChange={() => {
+                  setCheckedMacho(!checkedMacho);
+                }}
+              />
             </View>
             <View style={style.petCol}>
-            <Text style={style.textCheck}>Hembra</Text>
-            <Switch
-              value={checkedHembra}
-              color="#9575cd"
-              onValueChange={() => {
-                setCheckedHembra(!checkedHembra);
-              }}
-            />
+              <Text style={style.textCheck}>Hembra</Text>
+              <Switch
+                value={checkedHembra}
+                color="#9575cd"
+                onValueChange={() => {
+                  setCheckedHembra(!checkedHembra);
+                }}
+              />
             </View>
           </View>
         </View>
-        <Text style={{fontSize: 18, marginTop: 20}}>Tamaño:</Text>
+        <Text style={{ fontSize: 18, marginTop: 20 }}>Tamaño:</Text>
         <View style={style.petRow}>
-        <View style={style.petCol}>
-          <Text style={style.textCheck}>Pequeño</Text>
-          <Switch
-            value={checkedPeque}
-            color="#9575cd"
-            onValueChange={() => {
-              setCheckedPeque(!checkedPeque);
-            }}
-          />
+          <View style={style.petCol}>
+            <Text style={style.textCheck}>Pequeño</Text>
+            <Switch
+              value={checkedPeque}
+              color="#9575cd"
+              onValueChange={() => {
+                setCheckedPeque(!checkedPeque);
+              }}
+            />
           </View>
           <View style={style.petCol}>
-          <Text style={style.textCheck}>Mediano</Text>
-          <Switch
-            value={checkedMediano}
-            color="#9575cd"
-            onValueChange={() => {
-              setCheckedMediano(!checkedMediano);
-            }}
-          />
+            <Text style={style.textCheck}>Mediano</Text>
+            <Switch
+              value={checkedMediano}
+              color="#9575cd"
+              onValueChange={() => {
+                setCheckedMediano(!checkedMediano);
+              }}
+            />
           </View>
           <View style={style.petCol}>
-          <Text style={style.textCheck}>Grande</Text>
-          <Switch
-            value={checkedGrande}
-            color="#9575cd"
-            onValueChange={() => {
-              setCheckedGrande(!checkedGrande);
-            }}
-          />
+            <Text style={style.textCheck}>Grande</Text>
+            <Switch
+              value={checkedGrande}
+              color="#9575cd"
+              onValueChange={() => {
+                setCheckedGrande(!checkedGrande);
+              }}
+            />
           </View>
         </View>
-        <Text style={{fontSize: 18, marginTop: 20}}>Edad:</Text>
+        <Text style={{ fontSize: 18, marginTop: 20 }}>Edad:</Text>
         <View style={style.sliderCont}>
           <Text style={style.text}>
             {old.toString()}
@@ -255,10 +194,10 @@ const Filters = ({navigation, route}) => {
             minimumTrackTintColor="#9575cd"
             maximumTrackTintColor="#f5bb05"
             thumbTintColor="#9575cd"
-            style={{marginVertical: 10}}
+            style={{ marginVertical: 10 }}
           />
         </View>
-        <Text style={{fontSize: 18, marginTop: 20}}>Distancia:</Text>
+        <Text style={{ fontSize: 18, marginTop: 20 }}>Distancia:</Text>
         <View style={style.sliderCont}>
           <Text style={style.text}>
             {distancia.toString()}
@@ -274,14 +213,15 @@ const Filters = ({navigation, route}) => {
             minimumTrackTintColor="#9575cd"
             maximumTrackTintColor="#f5bb05"
             thumbTintColor="#9575cd"
-            thumbTouchSize={{width: 100, height: 100}}
-            style={{marginVertical: 10, marginBottom: 10}}
+            thumbTouchSize={{ width: 100, height: 100 }}
+            style={{ marginVertical: 10, marginBottom: 10 }}
           />
         </View>
         <Button
           style={style.ingresar}
           mode="contained"
-          onPress={() => getCurrentPosition()}>
+          onPress={() => aplicarFiltros()}
+        >
           Aplicar
         </Button>
       </View>
@@ -291,54 +231,54 @@ const Filters = ({navigation, route}) => {
 
 const style = StyleSheet.create({
   labelTS: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   contenedorRowTS: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   ingresar: {
-    justifyContent: 'flex-end',
-    backgroundColor: '#9575cd',
+    justifyContent: "flex-end",
+    backgroundColor: "#9575cd",
     borderRadius: 5,
-    shadowColor: '#000000',
+    shadowColor: "#000000",
     shadowOpacity: 0.8,
     elevation: 10,
     shadowRadius: 15,
-    shadowOffset: {width: 1, height: 13},
+    shadowOffset: { width: 1, height: 13 },
     marginHorizontal: 50,
   },
   contenedor: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     marginHorizontal: 20,
     marginTop: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 40,
-    shadowColor: '#000000',
+    shadowColor: "#000000",
     shadowOpacity: 0.8,
     shadowRadius: 15,
     elevation: 10,
-    shadowOffset: {width: 1, height: 13},
+    shadowOffset: { width: 1, height: 13 },
     marginVertical: 40,
     padding: 30,
     paddingTop: 20,
   },
   petRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingBottom: 8,
-    alignItems: 'center',
-    alignContent: 'center',
-    justifyContent: 'space-evenly'
+    alignItems: "center",
+    alignContent: "center",
+    justifyContent: "space-evenly",
   },
   petCol: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    alignContent: 'center',
+    flexDirection: "column",
+    alignItems: "center",
+    alignContent: "center",
     paddingEnd: 9,
   },
   petRowTS: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingBottom: 8,
     flex: 2,
   },
@@ -359,14 +299,14 @@ const style = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sliderCont: {
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
   },
   slider: {
-    color: '#9575cd',
+    color: "#9575cd",
   },
 });
 

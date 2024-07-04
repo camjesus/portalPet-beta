@@ -1,32 +1,34 @@
-import React from 'react';
-import {View} from 'react-native';
-import {Button} from 'react-native-paper';
+import React from "react";
+import { View } from "react-native";
+import { Button } from "react-native-paper";
 
-const SearchType = ({styles, state, setEstado}) => {
-  return (
-    <View style={styles.tipoBusqueda}>
-      <Button
+const SearchType = ({ styles, state, setEstado }) => {
+  /** <Button
         style={styles.buttonGL}
         mode="contained"
         color={state === 'inAdoption' ? '#f5bb05' : '#9575cd'}
         labelStyle={styles.labelStyleGroup}
         onPress={() => setEstado('inAdoption')}>
         Adopción
-      </Button>
+      </Button> **/
+  return (
+    <View style={styles.tipoBusqueda}>
       <Button
         style={styles.buttonG}
         mode="contained"
-        color={state === 'found' ? '#f5bb05' : '#9575cd'}
+        color={state === "found" ? "#f5bb05" : "#9575cd"}
         labelStyle={styles.labelStyleGroup}
-        onPress={() => setEstado('found')}>
+        onPress={() => setEstado("found")}
+      >
         Encontrados
       </Button>
       <Button
         style={styles.buttonGR}
         mode="contained"
-        color={state === 'wanted' ? '#f5bb05' : '#9575cd'}
+        color={state === "wanted" ? "#f5bb05" : "#9575cd"}
         labelStyle={styles.labelStyleGroup}
-        onPress={() => setEstado('wanted')}>
+        onPress={() => setEstado("wanted")}
+      >
         Buscados
       </Button>
     </View>

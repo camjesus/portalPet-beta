@@ -1,31 +1,34 @@
-import React, {useEffect, useState, useRef} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
-import {Headline, FAB} from 'react-native-paper';
-import globalStyles from '../styles/global';
-import MascotaItem from '../components/ui/MascotaItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Text, Card, IconButton} from 'react-native-paper';
-import Maticons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useIsFocused} from '@react-navigation/native';
+import React, { useEffect, useState, useRef } from "react";
+import { View, FlatList, StyleSheet, SafeAreaView } from "react-native";
+import { Headline, FAB } from "react-native-paper";
+import globalStyles from "../styles/global";
+import MascotaItem from "../components/ui/MascotaItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Text, Card, IconButton } from "react-native-paper";
+import Maticons from "react-native-vector-icons/MaterialCommunityIcons";
+import { ScrollView } from "react-native-gesture-handler";
+import { useIsFocused } from "@react-navigation/native";
+import { collection, query, getDocs, where } from "firebase/firestore";
+import { FIREBASE_DB } from "../FirebaseConfig";
 
 const MyPets = (props) => {
-  const {navigation} = props;
+  const { navigation } = props;
   const [pets, guardarMascotas] = useState([]);
-  const [userId, setUserId] = useState('');
-  const [name, setName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [userId, setUserId] = useState("");
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   const rescuer = {
     uid: userId,
     name: name,
-    lastName: lastName
+    lastName: lastName,
   };
   const newMascota = {
     active: true,
     changePhoto: true,
-    aboutMe: '',
-    old: '',
-    state: 'inAdoption',
+    aboutMe: "",
+    old: "",
+    state: "inAdoption",
     fechaCalculo: null,
     fechaFin: null,
     fechaInicio: null,
@@ -39,63 +42,62 @@ const MyPets = (props) => {
     name: null,
     rescuer: rescuer,
     rescuerId: userId,
-    sex: 'male',
-    size: 'small',
-    type: 'dog',
+    sex: "male",
+    size: "small",
+    type: "dog",
   };
 
   const [consultarMascotas, gConsMascotaApi] = useState(false); //si adopto una pet es para saber si recargo la pagina
   const isFocused = useIsFocused(); //devuelve true si la pantalla tiene foco
 
-  //const id = route.params;
   useEffect(() => {
     console.log('pase por el effect');
     obtenerDatosStorage();
     gConsMascotaApi(false);
-  }, [isFocused, consultarMascotas]); //cuando la pantalla tiene el foco
+  }, [isFocused, consultarMascotas]); 
 
   const obtenerDatosStorage = async () => {
     try {
-      await AsyncStorage.getItem('name').then((value) => {
+      await AsyncStorage.getItem("name").then((value) => {
         setName(value);
       });
-      await AsyncStorage.getItem('lastname').then((value) => {
+      await AsyncStorage.getItem("lastname").then((value) => {
         setLastName(value);
       });
-      await AsyncStorage.getItem('uid').then((value) => {
+      await AsyncStorage.getItem("uid").then((value) => {
         setUserId(value);
         //voy a buscar las pets una vez que tengo cargado el id, ya que es asincrono
+        console.log("userID");
+        console.log(value);
         obtenerMascotas(value);
       });
     } catch (error) {
       console.log(error);
     }
   };
-
   const obtenerMascotas = async (value) => {
-   try{
-    const colRef = collection(FIREBASE_DB,'pets');
-      const q = query(colRef, where('uid', '==', value));
-       getDocs(q).then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          console.log('doc');
-          console.log(doc);
-          console.log('docPet');
-          console.log(doc.data());
-          if(doc != null)
-          {
-            guardarMascotas(doc.data())
-          }
-        })
-      });  
-    }catch (ex){
+    try {
+      const myPets = [];
+        const colRef = collection(FIREBASE_DB, "pets");
+        const q = query(colRef, where("rescuerId", "==", value));
+        getDocs(q).then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            console.log("docPet");
+            console.log(doc.data());
+            if (doc != null) {
+              myPets.push(doc.data());
+            }
+          });
+          guardarMascotas(myPets);
+        });
+    } catch (ex) {
       console.log(ex);
-      console.log('ERROR AL BUSCAR MASCOTAS');
+      console.log("ERROR AL BUSCAR MASCOTAS");
     }
   };
 
   return (
-    <View style={globalStyles.base}>
+    <SafeAreaView style={globalStyles.base}>
       <View style={globalStyles.header}>
         <IconButton
           icon="arrow-left"
@@ -110,7 +112,7 @@ const MyPets = (props) => {
           color="#FFFFFF"
           style={styles.iconEdit}
           onPress={() => {
-            navigation.navigate('NewPet', {
+            navigation.navigate("NewPet", {
               pet: newMascota,
             });
           }}
@@ -129,7 +131,9 @@ const MyPets = (props) => {
 
       <FlatList
         data={pets}
-        renderItem={({item}) => (
+        horizontal={false}
+        numColumns={1}
+        renderItem={({ item }) => (
           <MascotaItem
             pet={item}
             consultarMascotas={gConsMascotaApi}
@@ -138,53 +142,54 @@ const MyPets = (props) => {
         )}
         keyExtractor={(item) => JSON.stringify(item.id)}
       />
+
       <View style={styles.container}>
         <FAB
           icon="plus"
           style={styles.fab}
           color="#FFFFFF"
           onPress={() => {
-            navigation.navigate('NewPet', {
+            navigation.navigate("NewPet", {
               pet: newMascota,
             });
           }}
           animated="true"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   fab: {
-    position: 'absolute',
+    position: "absolute",
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#9575cd',
+    backgroundColor: "#9575cd",
   },
   title: {
     margin: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 10,
-    flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    flexDirection: "row",
+    backgroundColor: "#ffffff",
   },
   titleTxt: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 35,
-    color: '#252932',
+    color: "#252932",
   },
   viewTitulo: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   titleIcon: {
     margin: 10,
   },
   iconEdit: {
-    alignItems: 'baseline',
-    alignContent: 'center',
-    justifyContent: 'flex-end',
+    alignItems: "baseline",
+    alignContent: "center",
+    justifyContent: "flex-end",
     marginEnd: 20,
     marginTop: 10,
   },

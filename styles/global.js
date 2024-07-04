@@ -13,6 +13,7 @@ const globalStyles = StyleSheet.create({
     color: '#FFFFFF',
   },
   base: {
+    paddingTop: 30,
     backgroundColor: '#FFFFFF',
     flex: 1,
   },

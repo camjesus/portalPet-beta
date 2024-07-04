@@ -1,7 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {StyleSheet, View, PermissionsAndroid, Image, Alert} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  StyleSheet,
+  View,
+  PermissionsAndroid,
+  Image,
+  Alert,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import {
   TextInput,
   Headline,
@@ -14,22 +20,26 @@ import {
   Paragraph,
   IconButton,
   FAB,
-} from 'react-native-paper';
+} from "react-native-paper";
 import * as Crypto from "expo-crypto";
-import {CheckBox} from 'react-native-elements';
-import globalStyles from '../styles/global';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../FirebaseConfig';
-import {AddNewPet} from '../store/actions/pet.action';
-import {useDispatch} from 'react-redux';
-import { collection, addDoc } from 'firebase/firestore';
+import { CheckBox } from "react-native-elements";
+import globalStyles from "../styles/global";
+import { FIREBASE_DB, FIREBASE_STORAGE } from "../FirebaseConfig";
+import { AddNewPet } from "../store/actions/pet.action";
+import { useDispatch } from "react-redux";
+import { collection, addDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
-
-const NewPet = ({navigation, route, props}) => {
-  console.log('route');
+const NewPet = ({ navigation, route, props }) => {
+  console.log("route");
   console.log(route);
-  const {params} = route;
-  const {pet} = params;
+  const { params } = route;
+  const { pet, imagePet } = params;
+
+  console.log('imagePet');
+  console.log(imagePet);
   const [edit, setEdit] = useState(pet.id != null ? true : false);
+
   const [name, gName] = useState(pet.name);
   const [sex, gSex] = useState(pet.sex);
   const [size, setSize] = useState(pet.size);
@@ -41,65 +51,72 @@ const NewPet = ({navigation, route, props}) => {
   const [rescuer, gRescuer] = useState(pet.rescuer);
   const [state, setState] = useState(pet.state);
   const [changePhoto] = React.useState(
-    pet.changePhoto === null ? false : pet.changePhoto,
+    pet.changePhoto === null ? false : pet.changePhoto
   );
-  console.log('pet');
+  console.log("pet");
   console.log(pet);
 
   const [checkedNoName, setCheckedNoName] = React.useState(false);
 
   const [alert, setAlert] = useState(false);
-  const [message, setMessage] = useState('');
-  const [title, setTitle] = useState('');
-  const [colorCamera, setColorCamera] = useState(pet.image_url == null ? '#252932' : '#FFFFFF' );
-  const [colorLocation] = useState(pet.longitud == null ? '#252932' : '#FFFFFF');
+  const [message, setMessage] = useState("");
+  const [title, setTitle] = useState("");
+  const [colorCamera, setColorCamera] = useState(
+    pet.image_url == null ? "#252932" : "#FFFFFF"
+  );
+  const [colorLocation] = useState(
+    pet.longitud == null ? "#252932" : "#FFFFFF"
+  );
+  const [resultadoCrear, setResultadoCrear] = useState(false);
 
   const descRef = useRef();
   const oldRef = useRef(pet.old);
   const petRef = useRef(pet.current);
-  const colorSelect = '#f5bb05';
-  const colorNoSelect = '#9575cd';
-  const auth = FIREBASE_AUTH;
+  const colorSelect = "#f5bb05";
+  const colorNoSelect = "#9575cd";
 
-  console.log('petRef');
+  console.log("petRef");
   console.log(petRef.current);
 
   const savePet = async (pet) => {
+    console.log("save pet");
+    console.log(pet);
+
     try {
-      if (name === '') {
-        setTitle('Advertencia');
-        setMessage('Es necesario ingresar un name');
+      if (name === "") {
+        setTitle("Advertencia");
+        setMessage("Es necesario ingresar un name");
         setAlert(true);
         return;
       }
 
-      if (old === '') {
-        setTitle('Advertencia');
-        setMessage('Es necesario ingrasar la old');
+      if (old === "") {
+        setTitle("Advertencia");
+        setMessage("Es necesario ingrasar la old");
         setAlert(true);
         return;
       }
 
-      if (aboutMe === '') {
-        setTitle('Advertencia');
-        setMessage('Es necesario ingrasar una descripción');
+      if (aboutMe === "") {
+        setTitle("Advertencia");
+        setMessage("Es necesario ingrasar una descripción");
         setAlert(true);
         return;
       }
 
       if (pet.image_url === null) {
-        setTitle('Advertencia');
-        setMessage('Es necesario cargar una foto para subir la pet');
+        setTitle("Advertencia");
+        setMessage("Es necesario cargar una foto para subir la pet");
         setAlert(true);
       }
 
       if (old > 30) {
-        setTitle('Advertencia');
-        setMessage('La mascota no puede ser mayor a 30 años');
+        setTitle("Advertencia");
+        setMessage("La mascota no puede ser mayor a 30 años");
         setAlert(true);
         return;
       }
-      
+
       //DESPUES LO REVERSO CUANDO SOLUCIONES View 'Map'
       //if (latitud === '' || longitud === '') {
       //  setTitle('Advertencia');
@@ -108,33 +125,36 @@ const NewPet = ({navigation, route, props}) => {
       //  return;
       //}
 
-      const newPetDB = {
-        active: true,
-        aboutMe: aboutMe,
-        old: parseInt(old),
-        state: state,
-        image_url: pet.image_url,
-        //id: pet.id !== null ? pet.id : Crypto.randomUUID(),
-        idAdopter: null,
-        latitud: latitud,
-        longitud: longitud,
-        name: name,
-        rescuer: rescuer,
-        rescuerId: rescuer.uid,
-        sex: sex,
-        size: size,
-        type: type,
-      };
-     
+      pet.name = name;
+      pet.aboutMe = aboutMe;
+      pet.type = type;
+      pet.sex = sex;
+      pet.size = size;
+      pet.old = old;
+      pet.longitud = longitud;
+      pet.latitud = latitud;
+      pet.state = state;
+
       if (edit) {
-        console.log('pet id distinto de null');
-      }
-      else {
-        console.log('newPetDB');
-        console.log(newPetDB);
+        console.log("pet id distinto de null");
+
+        //UPDATE
+      } else {
+        console.log("newPetDB");
+        console.log(pet);
+        pet.id = Crypto.randomUUID();
+        if (state === "found") {
+          pet.fechaInicio = new Date();
+          pet.fechaInicioS =
+            pet.fechaInicio.getDate() +
+            "/" +
+            pet.fechaInicio.getMonth() +
+            "/" +
+            pet.fechaInicio.getFullYear();
+        }
         //try{
         //  //useDispatch(AddNewPet(newPetDB));
-//
+        //
         //  if (edit) {
         //    setTitle('Editar Mascota');
         //    setMessage('La mascota se editó con éxito!');
@@ -142,7 +162,7 @@ const NewPet = ({navigation, route, props}) => {
         //    setTitle('Nueva Mascota');
         //    setMessage('La nueva mascota se creó con éxito!');
         //  }
-//
+        //
         //  setAlert(true);
         //}catch (ex){
         //  console.log(response);
@@ -152,51 +172,78 @@ const NewPet = ({navigation, route, props}) => {
         //}
 
         try {
-          //GUARDO EN MI BASE DE DATOS PETS
-          const newDoc = addDoc(collection(FIREBASE_DB, 'pets'), newPetDB);
-          console.log(newDoc);
-          console.log('newPet');
-          setResultadoCrear(true);
-        }
-        catch(error){
-            console.log("eeror al crear mascota" + error.code + error.message);
-            console.log(error);
-            setResultadoCrear(false);
-          }
-      }
-    }catch{
+          //GUARDO MI IMAGEN EN STORAGE
+          pet.image_url = await uploadImageAsync(pet.image_url);
 
-    }
+          //GUARDO EN MI BASE DE DATOS PETS
+          const newDoc = addDoc(collection(FIREBASE_DB, "pets"), pet);
+          console.log(newDoc);
+          console.log("newPet");
+          setResultadoCrear(true);
+        } catch (error) {
+          console.log("eeror al crear mascota" + error.code + error.message);
+          console.log(error);
+          setResultadoCrear(false);
+        }
+      }
+    } catch {}
   };
 
+
+  const uploadImageAsync = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function()
+      {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function(e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    try{
+      const refImage = ref(FIREBASE_STORAGE, "petImages/" + pet.id);
+      await uploadBytes(refImage, blob);
+      blob.close();
+      return await getDownloadURL(refImage);
+    }catch(error){
+      console.log(error);
+    }
+  }
+
   const updateFotoFirebase = (newFoto, petId) => {
-    db.collection('chats')
-      .where('idMascota', '==', petId)
+    db.collection("chats")
+      .where("idMascota", "==", petId)
       .onSnapshot((snapshot) => {
-        console.log('snapshot');
+        console.log("snapshot");
         console.log(snapshot);
-        console.log('encontre chats');
+        console.log("encontre chats");
         snapshot.docs.map((doc) =>
-          db.collection('chats').doc(doc.id).update({
+          db.collection("chats").doc(doc.id).update({
             imagenMascota: newFoto,
-          }),
+          })
         );
       });
   };
 
   const openMap = () => {
-    console.log('abrir Mapa ');
-    navigation.navigate('Map');
+    console.log("abrir Mapa ");
+    navigation.navigate("Map");
   };
 
   const openCamera = () => {
-    console.log('abrir camara ');
-    navigation.navigate('MyCamera', { pet : pet });
+    console.log("abrir camara ");
+    navigation.navigate("MyCamera", { pet: pet });
   };
 
   useEffect(() => {
-    console.log('entro a useEffec con coordenadas ' + route);
-    AsyncStorage.getItem('userId').then((value) => {
+    console.log("entro a useEffec con coordenadas " + route);
+    AsyncStorage.getItem("userId").then((value) => {
       gRescuer(value);
     });
     if (route.params?.coordinates) {
@@ -207,35 +254,31 @@ const NewPet = ({navigation, route, props}) => {
   }, [route.params?.coordinates]);
 
   useEffect(() => {
-   if(pet.image_url != null)
-   {
-    setColorCamera('#FFFFFF');
-   }
+    if (pet.image_url != null) {
+      setColorCamera("#FFFFFF");
+    }
   }, [pet.image_url]);
-  
+
   useEffect(() => {
     if (checkedNoName) {
-      if (state === 'found') {
+      if (state === "found") {
         console.log(name);
-        gName('Sin Collar');
+        gName("Sin Collar");
       } else {
         console.log(name);
-        gName('Sin Nombre');
+        gName("Sin Nombre");
       }
     } else {
       console.log(name);
       gName(null);
     }
-    console.log('petupdate');
+    console.log("petupdate");
     console.log(pet);
   }, [checkedNoName]);
 
   useEffect(() => {
     if (pet.id !== null) {
-      if (
-        pet.name == 'Sin Nombre' ||
-        pet.name == 'Sin Collar'
-      ) {
+      if (pet.name == "Sin Nombre" || pet.name == "Sin Collar") {
         setCheckedNoName(true);
       }
     }
@@ -244,8 +287,17 @@ const NewPet = ({navigation, route, props}) => {
     ref.current.focus();
   };
 
+  useEffect(() => {
+    console.log("paso a navigation my pets");
+    if (resultadoCrear) {
+      navigation.navigate("MyPets", {
+        gConsMascotaApi: true,
+      });
+    }
+  }, [resultadoCrear]);
+
   return (
-    <View style={{backgroundColor: '#FFFFFF'}}>
+    <View style={{ backgroundColor: "#FFFFFF" }}>
       <KeyboardAwareScrollView style={style.scroll}>
         <View style={globalStyles.header}>
           <IconButton
@@ -272,13 +324,13 @@ const NewPet = ({navigation, route, props}) => {
         <View style={globalStyles.base}>
           <View style={globalStyles.contenedor}>
             <View style={style.avatar}>
-                <Avatar.Image
-                  size={190}
-                   source={{
-                    uri: pet.image_url,
-                  }}
-                  style={style.avatarImage}
-                />
+              <Avatar.Image
+                size={190}
+                source={{
+                  uri: pet.image_url,
+                }}
+                style={style.avatarImage}
+              />
             </View>
             <View style={style.viewRowIcon}>
               <FAB
@@ -299,35 +351,42 @@ const NewPet = ({navigation, route, props}) => {
               />
             </View>
             <View style={style.buttonGroup}>
+              {/**
               <Button
                 style={style.buttonGL}
                 mode="contained"
                 compact={true}
-                buttonColor={state === 'inAdoption' ? colorSelect : colorNoSelect}
+                buttonColor={
+                  state === "inAdoption" ? colorSelect : colorNoSelect
+                }
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setState('inAdoption')}>
+                onPress={() => setState("inAdoption")}
+              >
                 Adopción
-              </Button>
+              </Button> */
+              }
               <Button
                 style={style.buttonG}
                 mode="contained"
-                buttonColor={state === 'found' ? colorSelect : colorNoSelect}
+                buttonColor={state === "found" ? colorSelect : colorNoSelect}
                 compact={true}
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setState('found')}>
+                onPress={() => setState("found")}
+              >
                 Encontrado
               </Button>
               <Button
                 style={style.buttonGR}
                 mode="contained"
-                buttonColor={state === 'wanted' ? colorSelect : colorNoSelect}
+                buttonColor={state === "wanted" ? colorSelect : colorNoSelect}
                 compact={true}
                 labelStyle={style.labelStyleGroup}
-                onPress={() => setState('wanted')}>
+                onPress={() => setState("wanted")}
+              >
                 Buscado
               </Button>
             </View>
-            <View style={{paddingHorizontal: 20}}>
+            <View style={{ paddingHorizontal: 20 }}>
               <View style={style.rowNombre}>
                 <TextInput
                   label="Nombre"
@@ -342,7 +401,7 @@ const NewPet = ({navigation, route, props}) => {
                 <View style={style.rowadefinir}>
                   <CheckBox
                     right
-                    title={state === 'found' ? 'Sin Collar' : 'Sin Nombre'}
+                    title={state === "found" ? "Sin Collar" : "Sin Nombre"}
                     containerStyle={style.checkStyle}
                     checkedIcon="dot-circle-o"
                     uncheckedIcon="circle-o"
@@ -355,7 +414,7 @@ const NewPet = ({navigation, route, props}) => {
                 </View>
               </View>
               <TextInput
-                label={'Descripción (' + (200 - aboutMe.length) + ')'}
+                label={"Descripción (" + (200 - aboutMe.length) + ")"}
                 value={aboutMe}
                 onChangeText={(text) => gAboutMe(text)}
                 style={style.input}
@@ -388,12 +447,11 @@ const NewPet = ({navigation, route, props}) => {
                     <Button
                       style={style.buttonGLS}
                       mode="contained"
-                      buttonColor={
-                        type === 'dog' ? colorSelect : colorNoSelect
-                      }
+                      buttonColor={type === "dog" ? colorSelect : colorNoSelect}
                       compact={true}
                       labelStyle={style.labelStyleGroup}
-                      onPress={() => gType('dog')}>
+                      onPress={() => gType("dog")}
+                    >
                       Perro
                     </Button>
                     <Button
@@ -401,10 +459,9 @@ const NewPet = ({navigation, route, props}) => {
                       mode="contained"
                       compact={true}
                       labelStyle={style.labelStyleGroup}
-                      buttonColor={
-                        type === 'cat' ? colorSelect : colorNoSelect
-                      }
-                      onPress={() => gType('cat')}>
+                      buttonColor={type === "cat" ? colorSelect : colorNoSelect}
+                      onPress={() => gType("cat")}
+                    >
                       Gato
                     </Button>
                   </View>
@@ -413,18 +470,22 @@ const NewPet = ({navigation, route, props}) => {
                       style={style.buttonGLS}
                       mode="contained"
                       compact={true}
-                      buttonColor={sex === 'male' ? colorSelect : colorNoSelect}
+                      buttonColor={sex === "male" ? colorSelect : colorNoSelect}
                       labelStyle={style.labelStyleGroup}
-                      onPress={() => gSex('male')}>
-                      MACHO
+                      onPress={() => gSex("male")}
+                    >
+                      Macho
                     </Button>
                     <Button
                       style={style.buttonGRS}
                       compact={true}
                       mode="contained"
                       labelStyle={style.labelStyleGroup}
-                      buttonColor={sex === 'famale' ? colorSelect : colorNoSelect}
-                      onPress={() => gSex('famale')}>
+                      buttonColor={
+                        sex === "famale" ? colorSelect : colorNoSelect
+                      }
+                      onPress={() => gSex("famale")}
+                    >
                       Hembra
                     </Button>
                   </View>
@@ -437,19 +498,21 @@ const NewPet = ({navigation, route, props}) => {
                 <Button
                   style={style.buttonGL}
                   mode="contained"
-                  buttonColor={size === 'small' ? colorSelect : colorNoSelect}
+                  buttonColor={size === "small" ? colorSelect : colorNoSelect}
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  onPress={() => setSize('small')}>
-                  chico
+                  onPress={() => setSize("small")}
+                >
+                  Chico
                 </Button>
                 <Button
                   style={style.buttonG}
                   mode="contained"
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  buttonColor={size === 'Medium' ? colorSelect : colorNoSelect}
-                  onPress={() => setSize('Medium')}>
+                  buttonColor={size === "medium" ? colorSelect : colorNoSelect}
+                  onPress={() => setSize("medium")}
+                >
                   Mediano
                 </Button>
                 <Button
@@ -457,45 +520,48 @@ const NewPet = ({navigation, route, props}) => {
                   mode="contained"
                   compact={true}
                   labelStyle={style.labelStyleGroup}
-                  buttonColor={size === 'big' ? colorSelect : colorNoSelect}
+                  buttonColor={size === "big" ? colorSelect : colorNoSelect}
                   animated={false}
-                  onPress={() => setSize('big')}>
-                  grande
+                  onPress={() => setSize("big")}
+                >
+                  Grande
                 </Button>
               </View>
             </View>
             <Button
               style={style.ingresar}
               mode="contained"
-              labelStyle={{color: '#FFFFFF'}}
+              labelStyle={{ color: "#FFFFFF" }}
               compact={true}
-              onPress={() => savePet(pet)}>
+              onPress={() => savePet(pet)}
+            >
               Guardar
             </Button>
             <PaperProvider>
               <View>
                 <Portal>
-                    <Dialog visible={alert} style={globalStyles.dialog}>
-                      <Dialog.Title style={globalStyles.dialosetTitle}>
-                        {title}
-                      </Dialog.Title>
-                      <Dialog.Content style={globalStyles.dialogMsj}>
-                        <Paragraph>{message}</Paragraph>
-                      </Dialog.Content>
-                      <Dialog.Actions>
-                        <Button
-                          onPress={() => {
-                            setAlert(false);
-                            if (title !== 'Advertencia') {
-                              navigation.navigate('MyPets', {
-                                consultarMascotas: true,
-                              });
-                            }
-                          }}>
-                          Ok
-                        </Button>
-                      </Dialog.Actions>
-                    </Dialog>
+                  <Dialog visible={alert} style={globalStyles.dialog}>
+                    <Dialog.Title style={globalStyles.dialosetTitle}>
+                      {title}
+                    </Dialog.Title>
+                    <Dialog.Content style={globalStyles.dialogMsj}>
+                      <Paragraph>{message}</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                      <Button
+                        onPress={() => {
+                          setAlert(false);
+                          if (title !== "Advertencia") {
+                            navigation.navigate("MyPets", {
+                              consultarMascotas: true,
+                            });
+                          }
+                        }}
+                      >
+                        Ok
+                      </Button>
+                    </Dialog.Actions>
+                  </Dialog>
                 </Portal>
               </View>
             </PaperProvider>
@@ -508,24 +574,24 @@ const NewPet = ({navigation, route, props}) => {
 
 const style = StyleSheet.create({
   rowadefinir: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
     marginStart: 5,
-    marginTop: 'auto',
+    marginTop: "auto",
   },
   adefinir: {
     fontSize: 14,
-    alignItems: 'baseline',
+    alignItems: "baseline",
   },
   rowNombre: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 0,
   },
   checkStyle: {
-    alignItems: 'baseline',
-    backgroundColor: '#FFFFFF',
+    alignItems: "baseline",
+    backgroundColor: "#FFFFFF",
     borderWidth: 0,
     padding: 0,
   },
@@ -552,25 +618,25 @@ const style = StyleSheet.create({
     marginEnd: 2,
   },
   buttonGroup: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "center",
     marginTop: 10,
     marginHorizontal: 15,
     flex: 1,
   },
   buttonGroupT: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "center",
     marginTop: 13,
     flex: 1,
     marginHorizontal: 30,
   },
   buttonGroupS: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "space-between",
     marginTop: 10,
     flex: 1,
     marginHorizontal: 10,
@@ -581,45 +647,45 @@ const style = StyleSheet.create({
   },
   fabLeft: {
     bottom: 0,
-    backgroundColor: '#9575cd',
+    backgroundColor: "#9575cd",
     elevation: 10,
-    shadowOffset: {width: 1, height: 13},
+    shadowOffset: { width: 1, height: 13 },
   },
   fabRight: {
     bottom: 0,
-    backgroundColor: '#9575cd',
+    backgroundColor: "#9575cd",
     elevation: 10,
-    shadowOffset: {width: 1, height: 13},
+    shadowOffset: { width: 1, height: 13 },
   },
   icon: {
     flex: 1,
   },
   ingresar: {
-    backgroundColor: '#9575cd',
+    backgroundColor: "#9575cd",
     padding: 3,
     borderRadius: 5,
-    shadowColor: '#000000',
+    shadowColor: "#000000",
     shadowOpacity: 0.8,
     elevation: 6,
     shadowRadius: 15,
-    shadowOffset: {width: 1, height: 13},
+    shadowOffset: { width: 1, height: 13 },
     marginHorizontal: 80,
     marginVertical: 10,
     marginTop: 20,
   },
   contenedor: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
   },
   input: {
     marginBottom: 3,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     fontSize: 13,
   },
   inputNombre: {
     marginBottom: 3,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     fontSize: 13,
     flex: 2,
   },
@@ -628,13 +694,13 @@ const style = StyleSheet.create({
     flex: 6,
   },
   petRowText: {
-    flexDirection: 'row',
+    flexDirection: "row",
     top: 10,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   petRowTipoSexo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     flex: 1,
     top: 5,
   },
@@ -654,48 +720,48 @@ const style = StyleSheet.create({
     paddingTop: 8,
   },
   old: {
-    width: '50%',
+    width: "50%",
   },
   textCheckEdad: {
     paddingTop: 8,
     marginStart: 5,
   },
   avatar: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 0,
     paddingBottom: 0,
   },
   avatarImage: {
     borderWidth: 1,
     //borderStyle: 'solid',
-    borderColor: '#252932',
+    borderColor: "#252932",
     height: 190,
     width: 190,
     borderRadius: 100,
   },
   viewRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   viewCheck: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   containerCheck: {
-    flexDirection: 'column',
-    justifyContent: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
     marginHorizontal: 10,
   },
   viewRowIcon: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: -30,
     paddingTop: 0,
-    marginHorizontal: '25%',
+    marginHorizontal: "25%",
   },
   labelStyleGroup: {
     fontSize: 11,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     padding: 0,
     margin: 0,
   },

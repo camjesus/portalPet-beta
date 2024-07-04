@@ -32,7 +32,7 @@ function CardMascota({pet, navigation, route}) {
           style={style.paw}
           name="paw"
           size={35}
-          color={pet?.size === 'Medium' ? '#9575cd' : '#FFFFFF'}
+          color={pet?.size === 'medium' ? '#9575cd' : '#FFFFFF'}
         />
         <Maticons
           style={style.paw}

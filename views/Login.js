@@ -112,12 +112,12 @@ const Login = (props) => {
       try {
         console.log('ENTRE user storage');
         console.log(user);
-        await AsyncStorage.setItem('uid', JSON.stringify(user.uid));
-        await AsyncStorage.setItem('id', JSON.stringify(user.id));
+        await AsyncStorage.setItem('uid', user.uid);
+        await AsyncStorage.setItem('id', user.id);
         await AsyncStorage.setItem('name', user.name);
         await AsyncStorage.setItem('lastname', user.lastname);
         await AsyncStorage.setItem('phone', user.phone);
-        await AsyncStorage.setItem('email', JSON.stringify(user.email));
+        await AsyncStorage.setItem('email', user.email);
       } catch (error) {
         console.log('User Storage Error: ' + error);
       }

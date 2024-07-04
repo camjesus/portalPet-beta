@@ -16,6 +16,7 @@ export default function MyCamera({navigation, route}) {
   console.log(pet);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
@@ -32,8 +33,10 @@ export default function MyCamera({navigation, route}) {
     if (cameraRef) {
       try {
         const data = await cameraRef.current.takePictureAsync();
+        console.log('file');
         console.log(data);
         setImage(data.uri);
+        setFile(data);
       } catch (error) {
         console.log(error);
       }
@@ -47,7 +50,9 @@ export default function MyCamera({navigation, route}) {
       quality: 1,
     });
 
+    console.log('file pick');
     console.log(result);
+    setFile(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
@@ -57,11 +62,10 @@ export default function MyCamera({navigation, route}) {
   const savePicture = async () => {
     if (image) {
       try {
-        const asset = await MediaLibrary.createAssetAsync(image);
-        pet.image_url = asset.uri;
-        pet.changePhoto = false;
+        //const asset = await MediaLibrary.createAssetAsync(image);
+        pet.image_url = image;
         setImage(null);
-        navigation.navigate('NewPet', {pet: pet});
+        navigation.navigate('NewPet', {imagePet: file, pet:pet});
       } catch (error) {
         console.log(error);
       }
